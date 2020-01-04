@@ -9,7 +9,7 @@ from time import sleep
 
 # Local settings
 price_data_csv = 'price_data.csv'
-mayer_values_csv = 'mayer_values.csv'
+mayer_values_csv = 'output-data/mayer_values.csv'
 google_client_secret_json = 'creds/client_secret.json'
 
 # Google settings
