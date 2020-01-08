@@ -5,6 +5,9 @@ from config import mayer_ranges
 
 def generate_mayer_values(source_file, output_file):
     print("Generating Mayer values...")
+
+    mayer_ranges.sort(reverse=True)
+
     df = pd.read_csv(source_file, skiprows=0)
 
     df = df.reset_index(drop=True)
