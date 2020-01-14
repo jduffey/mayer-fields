@@ -10,15 +10,15 @@ from time import sleep
 # Local settings
 price_data_csv = 'price_data.csv'
 mayer_values_csv = 'output-data/mayer_values.csv'
+day_ratios_csv = 'output-data/day_ratios.csv'
 google_client_secret_json = 'creds/client_secret.json'
 
 # Google settings
-workbook_name = "Mayer Multiples Chart"
+workbook_name = "Mayer Fields Data"
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret_json, scope)
 google_client = gspread.authorize(creds)
-sheet = google_client.open(workbook_name).sheet1
 
 # Coinbase settings
 coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>') # key/secret not needed for get_spot_price()
@@ -32,10 +32,11 @@ def get_most_recent_date(csv_filename):
     with open(csv_filename, 'r') as f:
         return list(csv.reader(f))[-1][0]
 
-def get_list_of_dates_from_gsheet(workbook_name):
-    sheet = google_client.open(workbook_name).sheet1
-    values_list = sheet.col_values(1)
-    return values_list
+def get_list_of_dates_from_gsheet(worksheet_name):
+    return google_client.open(workbook_name).worksheet(worksheet_name).col_values(1)
+
+def get_list_of_col_name_from_gsheet(worksheet_name):
+    return google_client.open(workbook_name).worksheet(worksheet_name).row_values(1)
 
 def get_spot_price_for_date(date):
     price_data = coinbase_client.get_spot_price(currency_pair = currency_pair, date = date)
@@ -105,30 +106,44 @@ if __name__ == '__main__':
     Google Sheets write code is below
     '''
 
+    # Mayer values
+    worksheet_name = "Mayer Multiples"
     mayer_values_from_csv = import_csv_as_list(mayer_values_csv)
 
-    dates_from_gsheet = get_list_of_dates_from_gsheet(workbook_name)
-    most_recent_date_in_gsheet = dates_from_gsheet[-1]
+    worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
+    gsheet_col_names = get_list_of_col_name_from_gsheet(worksheet_name)
+    print(f'Checking compatability of "{mayer_values_csv}" with "{worksheet_name}"...')
 
-    if most_recent_date_in_gsheet < yesterday:
-        print(f'Most recent date from Google workbook "{workbook_name}": {most_recent_date_in_gsheet}')
+    okay_to_upload = True
+    for i in range(len(mayer_values_from_csv[0])):
+        if(mayer_values_from_csv[0][i] != gsheet_col_names[i]):
+            okay_to_upload = False
+            print(f'Column names "{mayer_values_from_csv[0][i]}" and "{gsheet_col_names[i]}" differ; ' +
+                  f'data will not be uploaded to "{worksheet_name}".')
+            break;
+    if (okay_to_upload):
+        dates_from_gsheet = get_list_of_dates_from_gsheet(worksheet_name)
+        most_recent_date_in_gsheet = dates_from_gsheet[-1]
 
-        missing_gsheet_dates = get_date_range(get_day_after(most_recent_date_in_gsheet), yesterday)
+        if most_recent_date_in_gsheet < yesterday:
+            print(f'Most recent date from Google workbook "{worksheet_name}": {most_recent_date_in_gsheet}')
 
-        first_empty_row_index = len(dates_from_gsheet) + 1
+            missing_gsheet_dates = get_date_range(get_day_after(most_recent_date_in_gsheet), yesterday)
 
-        print('Writing missing data to GSheet...')
-        for missing_date in missing_gsheet_dates:
-            for row in mayer_values_from_csv:
-                if row[0] == missing_date:
-                    formatted_row = format_row(row)
-                    print(formatted_row)
-                    sheet.insert_row(formatted_row, first_empty_row_index)
-                    sleep(2) # don't anger the Google gods
-                    first_empty_row_index += 1
+            first_empty_row_index = len(dates_from_gsheet) + 1
 
-        print(f'Updated "{workbook_name}" with {len(missing_gsheet_dates)} record(s).')
+            print('Writing missing data to GSheet...')
+            for missing_date in missing_gsheet_dates:
+                for row in mayer_values_from_csv:
+                    if row[0] == missing_date:
+                        formatted_row = format_row(row)
+                        print(formatted_row)
+                        worksheet.insert_row(formatted_row, first_empty_row_index)
+                        sleep(2) # don't anger the Google gods
+                        first_empty_row_index += 1
 
-    else:
-        print(f'Most recent date in "{workbook_name}" ({most_recent_date_in_gsheet}) ' + \
-              f'is not before yesterday ({yesterday}); no data are missing.')
+            print(f'Updated "{workbook_name}" with {len(missing_gsheet_dates)} record(s).')
+
+        else:
+            print(f'Most recent date in "{workbook_name}" ({most_recent_date_in_gsheet}) ' + \
+                  f'is not before yesterday ({yesterday}); no data are missing.')
