@@ -1,16 +1,12 @@
 import csv
 from coinbase.wallet.client import Client
 from utils import generate_mayer_values, generate_day_ratios,\
-                  write_data_to_worksheet, get_yesterday
+                  write_data_to_worksheet, get_yesterday,\
+                  get_date_range, get_day_after
+from config import price_data_csv, mayer_values_csv, day_ratios_csv,\
+                   currency_pair
 
-# Local settings
-price_data_csv = 'price_data.csv'
-mayer_values_csv = 'output-data/mayer_values.csv'
-day_ratios_csv = 'output-data/day_ratios.csv'
-
-# Coinbase settings
-coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>') # key/secret not needed for get_spot_price()
-currency_pair = 'BTC-USD'
+coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>')
 
 def import_csv_as_list(csv_filename):
     with open(csv_filename, 'r') as f:
@@ -23,7 +19,6 @@ def get_most_recent_date(csv_filename):
 def get_spot_price_for_date(date):
     price_data = coinbase_client.get_spot_price(currency_pair = currency_pair, date = date)
     return price_data['amount']
-
 
 def get_price_dict_for_dates(dates):
     dates_and_prices = {}
@@ -64,13 +59,6 @@ if __name__ == '__main__':
 
     generate_mayer_values(price_data_csv, mayer_values_csv)
     generate_day_ratios(price_data_csv, day_ratios_csv)
-
-    '''
-    Google Sheets write code is below
-    '''
-
-    # worksheet_name = "Mayer Multiples"
-    # mayer_values_from_csv = import_csv_as_list(mayer_values_csv)
 
     write_data_to_worksheet(mayer_values_csv, "Mayer Multiples", yesterday)
     write_data_to_worksheet(day_ratios_csv, "Day Ratios", yesterday)
