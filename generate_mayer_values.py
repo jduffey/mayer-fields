@@ -1,5 +1,4 @@
 import csv
-import numpy as np
 import pandas as pd
 from config import mayer_ranges
 
@@ -16,7 +15,7 @@ def generate_mayer_values(source_file, output_file):
     for mayer_range in mayer_ranges:
         mayer_label = 'Mayer_' + str(mayer_range)
         mayer_labels.append(mayer_label)
-        df[mayer_label] = df['Spot']/df['Spot'].rolling(window=(mayer_range+1)).mean()
+        df[mayer_label] = df['Spot']/df['Spot'].rolling(window=(mayer_range + 1)).mean()
 
     df = df.round(4)
     df.to_csv(output_file, index=False)
