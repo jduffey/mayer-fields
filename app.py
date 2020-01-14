@@ -1,9 +1,7 @@
 import csv
-import pandas
 from coinbase.wallet.client import Client
-
-from utils import generate_mayer_values, write_data_to_worksheet, get_yesterday
-from time import sleep
+from utils import generate_mayer_values, generate_day_ratios,\
+                  write_data_to_worksheet, get_yesterday
 
 # Local settings
 price_data_csv = 'price_data.csv'
@@ -26,12 +24,6 @@ def get_spot_price_for_date(date):
     price_data = coinbase_client.get_spot_price(currency_pair = currency_pair, date = date)
     return price_data['amount']
 
-def get_day_after(date):
-    date_formatted = datetime.strptime(date, '%Y-%m-%d')
-    return datetime.strftime(date_formatted + timedelta(1), '%Y-%m-%d')
-
-def get_date_range(start_date, end_date):
-    return [date.strftime('%Y-%m-%d') for date in pandas.date_range(start_date, end_date)]
 
 def get_price_dict_for_dates(dates):
     dates_and_prices = {}
@@ -45,17 +37,6 @@ def append_data_to_csv(csv_filename, data):
     with open(price_data_csv, 'a') as f:
         for key in missing_price_data.keys():
             f.write("%s,%s\n"%(key,missing_price_data[key]))
-
-def format_row(unformatted_row):
-    formatted_row = []
-    formatted_row.append(unformatted_row[0])
-    formatted_row.append('${:,.2f}'.format(float(unformatted_row[1])))
-    for i in range(2, len(unformatted_row)):
-        if unformatted_row[i] == '': # skips missing Mayer values
-            formatted_row.append(unformatted_row[i])
-        else:
-            formatted_row.append(float(unformatted_row[i]))
-    return formatted_row
 
 
 if __name__ == '__main__':
@@ -82,12 +63,14 @@ if __name__ == '__main__':
               f'is not before yesterday ({yesterday}); no data are missing.')
 
     generate_mayer_values(price_data_csv, mayer_values_csv)
+    generate_day_ratios(price_data_csv, day_ratios_csv)
 
     '''
     Google Sheets write code is below
     '''
 
-    worksheet_name = "Mayer Multiples"
+    # worksheet_name = "Mayer Multiples"
     # mayer_values_from_csv = import_csv_as_list(mayer_values_csv)
 
-    write_data_to_worksheet(mayer_values_csv, worksheet_name, yesterday)
+    write_data_to_worksheet(mayer_values_csv, "Mayer Multiples", yesterday)
+    write_data_to_worksheet(day_ratios_csv, "Day Ratios", yesterday)
