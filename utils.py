@@ -63,7 +63,7 @@ def generate_mayer_values(source_file, output_file):
 
     df = df.round(4)
     df.to_csv(output_file, index=False)
-    print(f'Created "{output_file}".')
+    print(f'Created "{output_file}".\n')
 
 def generate_day_ratios(source_file, output_file):
     print("Generating day ratios...")
@@ -82,39 +82,46 @@ def generate_day_ratios(source_file, output_file):
 
     df = df.round(4)
     df.to_csv(output_file, index=False)
-    print(f'Created "{output_file}".')
+    print(f'Created "{output_file}".\n')
 
 def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
     data = import_csv_as_list(csv_filename)
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
     gsheet_col_names = get_list_of_col_name_from_gsheet(worksheet_name)
 
-    print(f'Checking compatability of "{csv_filename}" with "{worksheet_name}"...')
+    print(f'Checking compatability of "{csv_filename}" with "{worksheet_name}"...\n')
     okay_to_upload = True
     for i in range(len(data[0])):
         if(data[0][i] != gsheet_col_names[i]):
             okay_to_upload = False
             print(f'Column names "{data[0][i]}" and "{gsheet_col_names[i]}" differ; ' +
-                  f'data will not be uploaded to "{worksheet_name}".')
-            break;
+                  f'data will not be uploaded to "{worksheet_name}".\n')
+            break
 
     if (okay_to_upload):
         dates_from_gsheet = get_list_of_dates_from_gsheet(worksheet_name)
+        if dates_from_gsheet[-1] == 'NOW':
+            worksheet.delete_row(len(dates_from_gsheet))
+            dates_from_gsheet = get_list_of_dates_from_gsheet(worksheet_name)
         most_recent_date_in_gsheet = dates_from_gsheet[-1]
+        first_empty_row_index = len(dates_from_gsheet) + 1
+
         if most_recent_date_in_gsheet < yesterday:
             print(f'Most recent date from Google workbook "{worksheet_name}": {most_recent_date_in_gsheet}')
             missing_gsheet_dates = get_date_range(get_day_after(most_recent_date_in_gsheet), yesterday)
-            first_empty_row_index = len(dates_from_gsheet) + 1
-            print('Writing missing data to GSheet...')
+            print(f'Writing missing data to {worksheet_name}...')
             for missing_date in missing_gsheet_dates:
                 for row in data:
                     if row[0] == missing_date:
                         formatted_row = format_row(row)
-                        print(formatted_row)
+                        print(formatted_row[0:2])
                         worksheet.insert_row(formatted_row, first_empty_row_index)
                         sleep(2) # don't anger the Google gods
                         first_empty_row_index += 1
-            print(f'Updated "{worksheet_name}" with {len(missing_gsheet_dates)} record(s).')
+            print(f'Updated "{worksheet_name}" with {len(missing_gsheet_dates)} record(s).\n')
         else:
             print(f'Most recent date in "{worksheet_name}" ({most_recent_date_in_gsheet}) ' + \
-              f'is not before yesterday ({yesterday}); no data are missing.')
+              f'is not before yesterday ({yesterday}); no data are missing.\n')
+
+        price_now_row = format_row(data[-1])
+        worksheet.insert_row(price_now_row, first_empty_row_index)
