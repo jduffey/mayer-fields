@@ -4,7 +4,7 @@ from coinbase.wallet.client import Client
 from utils import generate_mayer_values, generate_day_ratios,\
                   write_data_to_worksheet, get_yesterday,\
                   get_date_range, get_day_after
-from config import coins_info
+from config import coin_vars
 
 coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>')
 
@@ -65,9 +65,10 @@ if __name__ == '__main__':
 
     yesterday = get_yesterday()
 
-    for i in range(len(coins_info)):
-        update_price_data(coins_info[i][0], coins_info[i][3], yesterday)
-        generate_mayer_values(coins_info[i][0], coins_info[i][1])
-        generate_day_ratios(coins_info[i][0], coins_info[i][2])
-        write_data_to_worksheet(coins_info[i][1], coins_info[i][4], yesterday)
-        write_data_to_worksheet(coins_info[i][2], coins_info[i][5], yesterday)
+    coins = ['BTC', 'ETH']
+    for coin in coins:
+        update_price_data(coin_vars[coin]['price_data'], coin_vars[coin]['currency_pair'], yesterday)
+        generate_mayer_values(coin_vars[coin]['price_data'], coin_vars[coin]['mayer_values'])
+        generate_day_ratios(coin_vars[coin]['price_data'], coin_vars[coin]['day_ratios'])
+        write_data_to_worksheet(coin_vars[coin]['mayer_values'], coin_vars[coin]['gsheet_mayer_values'], yesterday)
+        write_data_to_worksheet(coin_vars[coin]['day_ratios'], coin_vars[coin]['gsheet_day_ratios'], yesterday)

@@ -8,11 +8,21 @@ mayer_ranges = []
 day_ratio_ranges = []
 [day_ratio_ranges.append(i) for i in range(1, 401)]
 
-coins_info = [
-    ['price-data/BTC_price_data.csv', 'output-data/BTC_mayer_values.csv',\
-     'output-data/BTC_day_ratios.csv', 'BTC-USD',\
-     'BTC Mayer Multiples', 'BTC Day Ratios'],
-    ['price-data/ETH_price_data.csv', 'output-data/ETH_mayer_values.csv',\
-     'output-data/ETH_day_ratios.csv', 'ETH-USD',\
-     'ETH Mayer Multiples', 'ETH Day Ratios']\
-]
+coin_vars = {
+    'BTC': {
+        'price_data': 'price-data/BTC_price_data.csv',
+        'mayer_values': 'output-data/BTC_mayer_values.csv',
+        'day_ratios': 'output-data/BTC_day_ratios.csv',
+        'currency_pair': 'BTC-USD',
+        'gsheet_mayer_values': 'BTC Mayer Multiples',
+        'gsheet_day_ratios': 'BTC Day Ratios'
+    },
+    'ETH': {
+        'price_data': 'price-data/ETH_price_data.csv',
+        'mayer_values': 'output-data/ETH_mayer_values.csv',
+        'day_ratios': 'output-data/ETH_day_ratios.csv',
+        'currency_pair': 'ETH-USD',
+        'gsheet_mayer_values': 'ETH Mayer Multiples',
+        'gsheet_day_ratios': 'ETH Day Ratios'
+    }
+}
