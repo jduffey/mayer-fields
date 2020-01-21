@@ -8,8 +8,11 @@ mayer_ranges = []
 day_ratio_ranges = []
 [day_ratio_ranges.append(i) for i in range(1, 401)]
 
-price_data_csv = 'price_data.csv'
-mayer_values_csv = 'output-data/mayer_values.csv'
-day_ratios_csv = 'output-data/day_ratios.csv'
-
-currency_pair = 'BTC-USD'
+coins_info = [
+    ['BTC_price_data.csv', 'output-data/BTC_mayer_values.csv',\
+     'output-data/BTC_day_ratios.csv', 'BTC-USD',\
+     'BTC Mayer Multiples', 'BTC Day Ratios'],
+    ['ETH_price_data.csv', 'output-data/ETH_mayer_values.csv',\
+     'output-data/ETH_day_ratios.csv', 'ETH-USD',\
+     'ETH Mayer Multiples', 'ETH Day Ratios']\
+]
