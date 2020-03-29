@@ -15,25 +15,32 @@ google_client_secret_json = 'creds/client_secret.json'
 creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret_json, scope)
 google_client = gspread.authorize(creds)
 
+
 def get_list_of_dates_from_gsheet(worksheet_name):
     return google_client.open(workbook_name).worksheet(worksheet_name).col_values(1)
 
+
 def get_list_of_col_name_from_gsheet(worksheet_name):
     return google_client.open(workbook_name).worksheet(worksheet_name).row_values(1)
+
 
 def import_csv_as_list(csv_filename):
     with open(csv_filename, 'r') as f:
         return list(csv.reader(f))
 
+
 def get_yesterday():
     return datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d')
+
 
 def get_date_range(start_date, end_date):
     return [date.strftime('%Y-%m-%d') for date in pd.date_range(start_date, end_date)]
 
+
 def get_day_after(date):
     date_formatted = datetime.strptime(date, '%Y-%m-%d')
     return datetime.strftime(date_formatted + timedelta(1), '%Y-%m-%d')
+
 
 def format_row(unformatted_row):
     formatted_row = []
@@ -45,6 +52,7 @@ def format_row(unformatted_row):
         else:
             formatted_row.append(float(unformatted_row[i]))
     return formatted_row
+
 
 def generate_mayer_values(source_file, output_file):
     print("Generating Mayer values...")
@@ -65,6 +73,7 @@ def generate_mayer_values(source_file, output_file):
     df.to_csv(output_file, index=False)
     print(f'Created "{output_file}".\n')
 
+
 def generate_day_ratios(source_file, output_file):
     print("Generating day ratios...")
 
@@ -84,6 +93,7 @@ def generate_day_ratios(source_file, output_file):
     df.to_csv(output_file, index=False)
     print(f'Created "{output_file}".\n')
 
+
 def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
     data = import_csv_as_list(csv_filename)
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
@@ -92,13 +102,13 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
     print(f'Checking compatability of "{csv_filename}" with "{worksheet_name}"...\n')
     okay_to_upload = True
     for i in range(len(data[0])):
-        if(data[0][i] != gsheet_col_names[i]):
+        if data[0][i] != gsheet_col_names[i]:
             okay_to_upload = False
             print(f'Column names "{data[0][i]}" and "{gsheet_col_names[i]}" differ; ' +
                   f'data will not be uploaded to "{worksheet_name}".\n')
             break
 
-    if (okay_to_upload):
+    if okay_to_upload:
         dates_from_gsheet = get_list_of_dates_from_gsheet(worksheet_name)
         if dates_from_gsheet[-1] == 'NOW':
             worksheet.delete_row(len(dates_from_gsheet))
@@ -109,14 +119,14 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
         if most_recent_date_in_gsheet < yesterday:
             print(f'Most recent date from Google workbook "{worksheet_name}": {most_recent_date_in_gsheet}')
             missing_gsheet_dates = get_date_range(get_day_after(most_recent_date_in_gsheet), yesterday)
-            print(f'Writing missing data to {worksheet_name}...')
+            print(f'Writing missing data to "{worksheet_name}"...')
             for missing_date in missing_gsheet_dates:
                 for row in data:
                     if row[0] == missing_date:
                         formatted_row = format_row(row)
                         print(formatted_row[0:2])
                         worksheet.insert_row(formatted_row, first_empty_row_index)
-                        sleep(2) # don't anger the Google gods
+                        sleep(2) # don't anger the Google API gods
                         first_empty_row_index += 1
             print(f'Updated "{worksheet_name}" with {len(missing_gsheet_dates)} record(s).\n')
         else:

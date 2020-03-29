@@ -8,17 +8,21 @@ from config import coin_vars
 
 coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>')
 
+
 def import_csv_as_list(csv_filename):
     with open(csv_filename, 'r') as f:
         return list(csv.reader(f))
+
 
 def get_most_recent_date(csv_filename):
     with open(csv_filename, 'r') as f:
         return list(csv.reader(f))[-1][0]
 
+
 def get_spot_price_for_date(currency_pair, date):
     price_data = coinbase_client.get_spot_price(currency_pair=currency_pair, date=date)
     return price_data['amount']
+
 
 def get_price_dict_for_dates(currency_pair, dates):
     dates_and_prices = {}
@@ -29,15 +33,18 @@ def get_price_dict_for_dates(currency_pair, dates):
     print()
     return dates_and_prices
 
+
 def append_data_to_csv(csv_filename, data):
     with open(csv_filename, 'a') as f:
         for key in data.keys():
             f.write("%s,%s\n"%(key, data[key]))
 
+
 def remove_last_row_from_csv(csv_filename):
     df = pd.read_csv(csv_filename, skiprows=0)
     df.drop(df.tail(1).index,inplace=True)
     df.to_csv(csv_filename, index=False)
+
 
 def update_price_data(price_data_csv, currency_pair, yesterday):
     price_data_from_csv = import_csv_as_list(price_data_csv)
