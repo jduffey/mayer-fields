@@ -5,6 +5,7 @@ from config import mayer_ranges, day_ratio_ranges
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 from datetime import datetime, timedelta
+from os import path, mkdir
 
 
 # Google settings
@@ -55,6 +56,19 @@ def format_row(unformatted_row):
 
 
 def generate_mayer_values(source_file, output_file):
+    # TODO: if output file does not exist then create it
+    output_data_dir = "output-data/"
+    if path.exists(output_data_dir):
+        print(f'******* "{output_data_dir}" directory exists.')
+    else:
+        mkdir(output_data_dir)
+        print(f'******* Creating "{output_data_dir}" directory.')
+    if path.exists(output_file):
+        print(f'******* "{output_file}" exists.')
+    else:
+        _ = open(output_file, 'x')
+        print(f'******* Creating {output_file}')
+
     print("Generating Mayer values...")
 
     mayer_ranges.sort(reverse=True)
