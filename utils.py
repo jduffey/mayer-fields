@@ -55,19 +55,15 @@ def format_row(unformatted_row):
     return formatted_row
 
 
-def generate_mayer_values(source_file, output_file):
-    # TODO: if output file does not exist then create it
+def create_output_dir():
     output_data_dir = "output-data/"
-    if path.exists(output_data_dir):
-        print(f'******* "{output_data_dir}" directory exists.')
-    else:
+    if not path.exists(output_data_dir):
         mkdir(output_data_dir)
         print(f'******* Creating "{output_data_dir}" directory.')
-    if path.exists(output_file):
-        print(f'******* "{output_file}" exists.')
-    else:
-        _ = open(output_file, 'x')
-        print(f'******* Creating {output_file}')
+
+
+def generate_mayer_values(source_file, output_file):
+    create_output_dir()
 
     print("Generating Mayer values...")
 
@@ -89,6 +85,8 @@ def generate_mayer_values(source_file, output_file):
 
 
 def generate_day_ratios(source_file, output_file):
+    create_output_dir()
+
     print("Generating day ratios...")
 
     day_ratio_ranges.sort(reverse=True)
