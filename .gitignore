@@ -2,6 +2,7 @@ creds/client_secret.json
 output-data
 price-data
 sandbox
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
