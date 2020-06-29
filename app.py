@@ -79,12 +79,11 @@ if __name__ == '__main__':
         mayer_values = coin_vars[coin]['mayer_values']
         day_ratios = coin_vars[coin]['day_ratios']
 
-        update_price_data(price_data, currency_pair, yesterday)
-
-        generate_mayer_values(price_data, mayer_values)
-
-        generate_day_ratios(price_data, day_ratios)
-
-        write_data_to_worksheet(mayer_values, coin_vars[coin]['gsheet_mayer_values'], yesterday)
-
-        write_data_to_worksheet(day_ratios, coin_vars[coin]['gsheet_day_ratios'], yesterday)
+        try:
+            update_price_data(price_data, currency_pair, yesterday)
+            generate_mayer_values(price_data, mayer_values)
+            generate_day_ratios(price_data, day_ratios)
+            write_data_to_worksheet(mayer_values, coin_vars[coin]['gsheet_mayer_values'], yesterday)
+            write_data_to_worksheet(day_ratios, coin_vars[coin]['gsheet_day_ratios'], yesterday)
+        except Exception as error:
+            print(f'!! EXCEPTION encountered while attempting workflow for {coin} !!:\n{error}')

@@ -59,7 +59,7 @@ def create_output_dir():
     output_data_dir = "output-data/"
     if not path.exists(output_data_dir):
         mkdir(output_data_dir)
-        print(f'******* Creating "{output_data_dir}" directory.')
+        print(f'Creating "{output_data_dir}" directory.\n')
 
 
 def generate_mayer_values(source_file, output_file):
