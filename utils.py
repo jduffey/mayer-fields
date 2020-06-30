@@ -6,6 +6,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 from datetime import datetime, timedelta
 from os import path, mkdir
+import printer
 
 
 # Google settings
@@ -59,18 +60,15 @@ def create_output_dir():
     output_data_dir = "output-data/"
     if not path.exists(output_data_dir):
         mkdir(output_data_dir)
-        print(f'Creating "{output_data_dir}" directory.\n')
+        printer.created_directory(output_data_dir)
 
 
 def generate_mayer_values(source_file, output_file):
     create_output_dir()
-
-    print("Generating Mayer values...")
+    printer.generating_mayer_values()
 
     mayer_ranges.sort(reverse=True)
-
     df = pd.read_csv(source_file, skiprows=0)
-
     df = df.reset_index(drop=True)
 
     mayer_labels = []
@@ -81,18 +79,15 @@ def generate_mayer_values(source_file, output_file):
 
     df = df.round(4)
     df.to_csv(output_file, index=False)
-    print(f'Created "{output_file}".\n')
+    printer.created_file(output_file)
 
 
 def generate_day_ratios(source_file, output_file):
     create_output_dir()
-
-    print("Generating day ratios...")
+    printer.generating_day_ratios()
 
     day_ratio_ranges.sort(reverse=True)
-
     df = pd.read_csv(source_file, skiprows=0)
-
     df = df.reset_index(drop=True)
 
     day_ratio_labels = []
@@ -103,7 +98,7 @@ def generate_day_ratios(source_file, output_file):
 
     df = df.round(4)
     df.to_csv(output_file, index=False)
-    print(f'Created "{output_file}".\n')
+    printer.created_file(output_file)
 
 
 def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
@@ -111,13 +106,12 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
     gsheet_col_names = get_list_of_col_name_from_gsheet(worksheet_name)
 
-    print(f'Checking compatability of "{csv_filename}" with "{worksheet_name}"...\n')
+    printer.check_compatibility_of_price_data_with_worksheet(csv_filename, workbook_name)
     okay_to_upload = True
     for i in range(len(data[0])):
         if data[0][i] != gsheet_col_names[i]:
             okay_to_upload = False
-            print(f'Column names "{data[0][i]}" and "{gsheet_col_names[i]}" differ; ' +
-                  f'data will not be uploaded to "{worksheet_name}".\n')
+            printer.data_differ_no_upload(data, gsheet_col_names, workbook_name)
             break
 
     if okay_to_upload:
@@ -129,9 +123,9 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
         first_empty_row_index = len(dates_from_gsheet) + 1
 
         if most_recent_date_in_gsheet < yesterday:
-            print(f'Most recent date from Google workbook "{worksheet_name}": {most_recent_date_in_gsheet}')
+            printer.most_recent_date_from_worksheet(worksheet_name, most_recent_date_in_gsheet)
             missing_gsheet_dates = get_date_range(get_day_after(most_recent_date_in_gsheet), yesterday)
-            print(f'Writing missing data to "{worksheet_name}"...')
+            printer.writing_data_to_worksheet(worksheet_name)
             for missing_date in missing_gsheet_dates:
                 for row in data:
                     if row[0] == missing_date:
@@ -140,10 +134,11 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
                         worksheet.insert_row(formatted_row, first_empty_row_index)
                         sleep(2) # don't anger the Google API gods
                         first_empty_row_index += 1
-            print(f'Updated "{worksheet_name}" with {len(missing_gsheet_dates)} record(s).\n')
+            # TODO: if price data cannot be retrieved and this step is allowed to continue
+            #       it will still report that n records have been updated
+            printer.updated_worksheet_with_n_records(worksheet_name, missing_gsheet_dates)
         else:
-            print(f'Most recent date in "{worksheet_name}" ({most_recent_date_in_gsheet}) ' + \
-              f'is not before yesterday ({yesterday}); no data are missing.\n')
+            printer.most_recent_date_in_worksheet_not_before_yesterday(worksheet_name, most_recent_date_in_gsheet, yesterday)
 
         price_now_row = format_row(data[-1])
         worksheet.insert_row(price_now_row, first_empty_row_index)

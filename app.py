@@ -5,6 +5,7 @@ from utils import generate_mayer_values, generate_day_ratios,\
                   write_data_to_worksheet, get_yesterday,\
                   get_date_range, get_day_after
 from config import coin_vars
+import printer
 
 coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>')
 
@@ -29,8 +30,8 @@ def get_price_dict_for_dates(currency_pair, dates):
     for date in dates:
         price = get_spot_price_for_date(currency_pair, date)
         dates_and_prices[date] = price
-        print(f'{date}: ${price}')
-    print()
+        printer.date_and_price(date, price)
+
     return dates_and_prices
 
 
@@ -53,17 +54,16 @@ def update_price_data(price_data_csv, currency_pair, yesterday):
         most_recent_date_in_price_data = price_data_from_csv[-2][0]
         remove_last_row_from_csv(price_data_csv)
     if most_recent_date_in_price_data < yesterday:
-        print(f'Most recent date in "{price_data_csv}": {most_recent_date_in_price_data}')
-        print('Gathering missing price data...\n')
+        printer.gathering_missing_price_data(price_data_csv, most_recent_date_in_price_data)
         missing_price_dates = get_date_range(get_day_after(most_recent_date_in_price_data), yesterday)
         missing_price_data = get_price_dict_for_dates(currency_pair, missing_price_dates)
         append_data_to_csv(price_data_csv, missing_price_data)
-        print(f'Updated "{price_data_csv}" with {len(missing_price_data)} record(s).\n')
+        printer.updated_price_data_with_n_records(price_data_csv, missing_price_data)
     else:
-        print(f'Most recent date in "{price_data_csv}" ({most_recent_date_in_price_data}) ' + \
-              f'is not before yesterday ({yesterday}); no data are missing.\n')
+        printer.no_data_missing_from_price_data(price_data_csv, most_recent_date_in_price_data, yesterday)
+
     now_price = coinbase_client.get_spot_price(currency_pair=currency_pair)['amount']
-    print('Current: ${:,.2f}\n'.format(float(now_price)))
+    printer.current_price(now_price)
     with open(price_data_csv,'a') as fd:
         fd.write(f'NOW, {now_price}')
 
@@ -86,4 +86,4 @@ if __name__ == '__main__':
             write_data_to_worksheet(mayer_values, coin_vars[coin]['gsheet_mayer_values'], yesterday)
             write_data_to_worksheet(day_ratios, coin_vars[coin]['gsheet_day_ratios'], yesterday)
         except Exception as error:
-            print(f'!! EXCEPTION encountered while attempting workflow for {coin}:\n{error}\n')
+            printer.exception_encountered(coin, error)
