@@ -86,4 +86,4 @@ if __name__ == '__main__':
             write_data_to_worksheet(mayer_values, coin_vars[coin]['gsheet_mayer_values'], yesterday)
             write_data_to_worksheet(day_ratios, coin_vars[coin]['gsheet_day_ratios'], yesterday)
         except Exception as error:
-            print(f'!! EXCEPTION encountered while attempting workflow for {coin} !!:\n{error}')
+            print(f'!! EXCEPTION encountered while attempting workflow for {coin}:\n{error}\n')
