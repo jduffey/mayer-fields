@@ -58,12 +58,12 @@ def update_price_data(price_data_csv, currency_pair, yesterday):
         missing_price_dates = get_date_range(get_day_after(most_recent_date_in_price_data), yesterday)
         missing_price_data = get_price_dict_for_dates(currency_pair, missing_price_dates)
         append_data_to_csv(price_data_csv, missing_price_data)
-        printer.updated_price_data_with_n_records(price_data_csv, missing_price_data)
+        printer.updated_price_data(price_data_csv, missing_price_data)
     else:
         printer.no_data_missing_from_price_data(price_data_csv, most_recent_date_in_price_data, yesterday)
 
     now_price = coinbase_client.get_spot_price(currency_pair=currency_pair)['amount']
-    printer.current_price(now_price)
+    printer.current_price(coin, now_price)
     with open(price_data_csv,'a') as fd:
         fd.write(f'NOW, {now_price}')
 
@@ -74,6 +74,8 @@ if __name__ == '__main__':
 
     coins = ['BTC', 'ETH']
     for coin in coins:
+        printer.initiating_workflow(coin)
+
         price_data = coin_vars[coin]['price_data']
         currency_pair = coin_vars[coin]['currency_pair']
         mayer_values = coin_vars[coin]['mayer_values']
@@ -86,4 +88,4 @@ if __name__ == '__main__':
             write_data_to_worksheet(mayer_values, coin_vars[coin]['gsheet_mayer_values'], yesterday)
             write_data_to_worksheet(day_ratios, coin_vars[coin]['gsheet_day_ratios'], yesterday)
         except Exception as error:
-            printer.exception_encountered(coin, error)
+            printer.exception_encountered(error, coin)

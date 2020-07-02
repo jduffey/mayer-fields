@@ -6,7 +6,7 @@ def created_directory(output_data_dir):
     print(f'Creating "{output_data_dir}" directory.\n')
 
 
-def updated_worksheet_with_n_records(worksheet_name, missing_gsheet_dates):
+def updated_worksheet(worksheet_name, missing_gsheet_dates):
     print(f'Updated "{worksheet_name}" with {len(missing_gsheet_dates)} record(s).\n')
 
 
@@ -49,7 +49,7 @@ def gathering_missing_price_data(price_data_csv, most_recent_date_in_price_data)
           f'Gathering missing price data...\n')
 
 
-def updated_price_data_with_n_records(price_data_csv, missing_price_data):
+def updated_price_data(price_data_csv, missing_price_data):
     print(f'Updated "{price_data_csv}" with {len(missing_price_data)} record(s).\n')
 
 
@@ -58,9 +58,14 @@ def no_data_missing_from_price_data(price_data_csv, most_recent_date_in_price_da
               f'is not before yesterday ({yesterday}); no data are missing.\n')
 
 
-def current_price(now_price):
-    print('Current: ${:,.2f}\n'.format(float(now_price)))
+def current_price(coin, now_price):
+    print(f'Current price of {coin}: '
+           '${:,.2f}\n'.format(float(now_price)))
 
 
-def exception_encountered(coin, error):
+def exception_encountered(error, coin):
     print(f'!! EXCEPTION encountered while attempting workflow for {coin}:\n{error}\n')
+
+
+def initiating_workflow(coin):
+    print(f'=== Initiating workflow for {coin} ===\n')

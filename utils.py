@@ -136,7 +136,7 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
                         first_empty_row_index += 1
             # TODO: if price data cannot be retrieved and this step is allowed to continue
             #       it will still report that n records have been updated
-            printer.updated_worksheet_with_n_records(worksheet_name, missing_gsheet_dates)
+            printer.updated_worksheet(worksheet_name, missing_gsheet_dates)
         else:
             printer.most_recent_date_in_worksheet_not_before_yesterday(worksheet_name, most_recent_date_in_gsheet, yesterday)
 
