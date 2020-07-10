@@ -159,7 +159,7 @@ def get_spot_price_for_date(coinbase_client, currency_pair, date):
 def get_price_dict_for_dates(currency_pair, dates):
     dates_and_prices = {}
     for date in dates:
-        price = get_spot_price_for_date(currency_pair, date)
+        price = get_spot_price_for_date(coinbase_client, currency_pair, date)
         dates_and_prices[date] = price
         printer.date_and_price(date, price)
     return dates_and_prices
