@@ -37,6 +37,8 @@ if __name__ == '__main__':
         sma200_value = 0
 
         while sma200_value < target_sma_ratio:
+            now_price = now_price + coin_jump
+
             csv_filename = f'price-data/{coin_name}_price_data.csv'
 
             df = pd.read_csv(csv_filename, skiprows=0, skipfooter=1)
@@ -45,8 +47,6 @@ if __name__ == '__main__':
             sma200_values = df['Spot']/df['Spot'].rolling(window=(200 + 1)).mean()
 
             sma200_value = sma200_values[sma200_values.index.max()]
-
-            now_price = now_price + coin_jump
 
         print(f'{coin_name}: ${now_price}: {sma200_value}')
 

@@ -29,7 +29,7 @@ def exception_encountered(error, coin):
 
 
 def gathering_missing_price_data(price_data_csv, most_recent_date_in_price_data):
-    print(f'Most recent date in "{price_data_csv}": {most_recent_date_in_price_data}'
+    print(f'Most recent date in "{price_data_csv}": {most_recent_date_in_price_data}\n'
           f'Gathering missing price data...\n')
 
 
