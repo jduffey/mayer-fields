@@ -11,21 +11,17 @@ day_ratio_ranges = []
 output_data_dir = "output-data/"
 price_data_dir = "price-data/"
 
-coin_vars = {
-    'BTC': {
-        'price_data': f'{price_data_dir}BTC_price_data.csv',
-        'mayer_values': f'{output_data_dir}BTC_mayer_values.csv',
-        'day_ratios': f'{output_data_dir}BTC_day_ratios.csv',
-        'currency_pair': 'BTC-USD',
-        'gsheet_mayer_values': 'BTC Mayer Multiples',
-        'gsheet_day_ratios': 'BTC Day Ratios'
-    },
-    'ETH': {
-        'price_data': f'{price_data_dir}ETH_price_data.csv',
-        'mayer_values': f'{output_data_dir}ETH_mayer_values.csv',
-        'day_ratios': f'{output_data_dir}ETH_day_ratios.csv',
-        'currency_pair': 'ETH-USD',
-        'gsheet_mayer_values': 'ETH Mayer Multiples',
-        'gsheet_day_ratios': 'ETH Day Ratios'
-    }
-}
+coins = ['BTC', 'ETH']
+
+coin_vars = {}
+for coin in coins:
+    coin_vars.update(
+        {coin : {
+            'price_data': f'{price_data_dir}{coin}_price_data.csv',
+            'mayer_values': f'{output_data_dir}{coin}_mayer_values.csv',
+            'day_ratios': f'{output_data_dir}{coin}_day_ratios.csv',
+            'currency_pair': f'{coin}-USD',
+            'gsheet_mayer_values': f'{coin} Mayer Multiples',
+            'gsheet_day_ratios': f'{coin} Day Ratios'
+        }
+    })
