@@ -25,6 +25,7 @@ if __name__ == '__main__':
             utils.write_data_to_worksheet(day_ratios, coin_vars[coin]['gsheet_day_ratios'], yesterday)
         except Exception as error:
             printer.exception_encountered(error, coin)
+            printer.hint_vpn()
 
 
     target_sma_ratio = 2.4
