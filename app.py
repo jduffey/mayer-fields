@@ -28,29 +28,37 @@ if __name__ == '__main__':
             printer.hint_vpn()
 
 
-    target_sma_ratio = 2.4
+    target_sma_ratios = [2.4 + 0.1 * x for x in range(11)]
+    print(target_sma_ratios)
     def find_mayer_price(coin):
         coin_name = coin[0]
         coin_jump = coin[1]
         now_date = 'NOW'
-        now_price = 0
+        sma_day_range = 200
+
         sma200_value = 0
+        csv_filename = f'price-data/{coin_name}_price_data.csv'
+        original_df = pd.read_csv(csv_filename, skiprows=0, skipfooter=1)
+        now_price = original_df.loc[original_df.index.max()]['Spot']
+        now_price = now_price - now_price % coin_jump
 
-        while sma200_value < target_sma_ratio:
-            now_price = now_price + coin_jump
+        for target_sma_ratio in target_sma_ratios:
+            while sma200_value < target_sma_ratio:
+                df = original_df.copy()
 
-            csv_filename = f'price-data/{coin_name}_price_data.csv'
+                df.loc[df.index.max() + 1] = [now_date, now_price]
 
-            df = pd.read_csv(csv_filename, skiprows=0, skipfooter=1)
-            df.loc[df.index.max() + 1] = [now_date, now_price]
+                sma200_values = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
 
-            sma200_values = df['Spot']/df['Spot'].rolling(window=(200 + 1)).mean()
+                sma200_value = sma200_values[sma200_values.index.max()]
 
-            sma200_value = sma200_values[sma200_values.index.max()]
+                now_price = now_price + coin_jump
 
-        print(f'{coin_name}: ${now_price}: {sma200_value}')
+            print(f'{coin_name}: ${now_price}: {sma200_value}')
 
-    coins = [('BTC', 50), ('ETH', 5)]
-    print(f'=== Price where SMA200 > {target_sma_ratio} ===')
+    coins = [('BTC', 10), ('ETH', 5)]
     for coin in coins:
+        coin_name = coin[0]
+        coin_step = coin[1]
+        print(f'=== Price where {coin_name} SMA200 >= value; stepping by ${coin_step} ===')
         find_mayer_price(coin)
