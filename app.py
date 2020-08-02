@@ -38,9 +38,15 @@ if __name__ == '__main__':
 
         sma200_value = 0
         csv_filename = f'price-data/{coin_name}_price_data.csv'
-        original_df = pd.read_csv(csv_filename, skiprows=0, skipfooter=1)
+        original_df = pd.read_csv(csv_filename, skiprows=0)
         now_price = original_df.loc[original_df.index.max()]['Spot']
         now_price = now_price - now_price % coin_jump
+        df = original_df.copy()
+        df.loc[df.index.max() + 1] = [now_date, now_price]
+        current_sma_ratios = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
+        current_sma_ratio = current_sma_ratios[current_sma_ratios.index.max()]
+        print(f'Current price rounded down to nearest ${coin_jump}: ${now_price}')
+        print(f'Current SMA ratio: {current_sma_ratio}\n')
 
         for target_sma_ratio in target_sma_ratios:
             while sma200_value < target_sma_ratio:
@@ -52,13 +58,14 @@ if __name__ == '__main__':
 
                 sma200_value = sma200_values[sma200_values.index.max()]
 
-                now_price = now_price + coin_jump
+                if target_sma_ratio <= sma200_value:
+                    print(f'{coin_name}: ${now_price}: {sma200_value}')
 
-            print(f'{coin_name}: ${now_price}: {sma200_value}')
+                now_price = now_price + coin_jump
 
     coins = [('BTC', 10), ('ETH', 5)]
     for coin in coins:
         coin_name = coin[0]
         coin_step = coin[1]
-        print(f'=== Price where {coin_name} SMA200 >= value; stepping by ${coin_step} ===')
+        print(f'\n=== Price where {coin_name} SMA200 >= value; stepping by ${coin_step} ===\n')
         find_mayer_price(coin)
