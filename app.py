@@ -2,6 +2,7 @@ from config import coin_vars
 import printer
 import utils
 import pandas as pd
+import numpy as np
 
 
 if __name__ == '__main__':
@@ -27,45 +28,63 @@ if __name__ == '__main__':
             printer.exception_encountered(error, coin)
             printer.hint_vpn()
 
+    target_sma_ratio_min = 2.4
+    target_sma_ratio_step = 0.1
+    target_sma_ratios = [target_sma_ratio_min + target_sma_ratio_step * x for x in range(11)]
 
-    target_sma_ratios = [2.4 + 0.1 * x for x in range(11)]
-    print(target_sma_ratios)
     def find_mayer_price(coin):
+        sma_pairs = [(200, [2.4 + 0.1 * x for x in range(11)]),
+                     (30, [1.2, 1.3, 1.4])]
         coin_name = coin[0]
-        coin_jump = coin[1]
+        coin_step = coin[1]
+
         now_date = 'NOW'
-        sma_day_range = 200
 
-        sma200_value = 0
-        csv_filename = f'price-data/{coin_name}_price_data.csv'
-        original_df = pd.read_csv(csv_filename, skiprows=0)
-        now_price = original_df.loc[original_df.index.max()]['Spot']
-        now_price = now_price - now_price % coin_jump
-        df = original_df.copy()
-        df.loc[df.index.max() + 1] = [now_date, now_price]
-        current_sma_ratios = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
-        current_sma_ratio = current_sma_ratios[current_sma_ratios.index.max()]
-        print(f'Current price rounded down to nearest ${coin_jump}: ${now_price}')
-        print(f'Current SMA ratio: {current_sma_ratio}\n')
+        for sma_pair in sma_pairs:
+            sma_day_range = sma_pair[0]
+            target_sma_ratios = sma_pair[1]
+            print(f'SMA Day Range: {sma_day_range}')
+            print(f'Target SMA ratios: {target_sma_ratios}')
+            sma_ratio_value = 0
+            csv_filename = f'price-data/{coin_name}_price_data.csv'
+            original_df = pd.read_csv(csv_filename, skiprows=0)
+            now_price = original_df.loc[original_df.index.max()]['Spot']
+            now_price = now_price - now_price % coin_step
+            df = original_df.copy()
+            df.loc[df.index.max() + 1] = [now_date, now_price]
+            current_sma_ratios = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
+            current_sma_ratio = current_sma_ratios[current_sma_ratios.index.max()]
+            print(f'Current price rounded down to nearest ${coin_step}: ${now_price}')
+            print(f'Current SMA ratio: {current_sma_ratio}\n')
 
-        for target_sma_ratio in target_sma_ratios:
-            while sma200_value < target_sma_ratio:
-                df = original_df.copy()
+            for target_sma_ratio in target_sma_ratios:
+                while sma_ratio_value < target_sma_ratio:
+                    df = original_df.copy()
 
-                df.loc[df.index.max() + 1] = [now_date, now_price]
+                    df.loc[df.index.max() + 1] = [now_date, now_price]
 
-                sma200_values = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
+                    sma_values = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
 
-                sma200_value = sma200_values[sma200_values.index.max()]
+                    sma_ratio_value = sma_values[sma_values.index.max()]
 
-                if target_sma_ratio <= sma200_value:
-                    print(f'{coin_name}: ${now_price}: {sma200_value}')
+                    if target_sma_ratio <= sma_ratio_value:
+                        print(f'{coin_name}: ${now_price}: {sma_ratio_value}')
 
-                now_price = now_price + coin_jump
+                    now_price += coin_step
 
     coins = [('BTC', 10), ('ETH', 5)]
     for coin in coins:
         coin_name = coin[0]
         coin_step = coin[1]
-        print(f'\n=== Price where {coin_name} SMA200 >= value; stepping by ${coin_step} ===\n')
+
         find_mayer_price(coin)
+
+        reduce_percentages = np.arange(0.1, 0.51, 0.05).tolist()
+
+        csv_filename = f'price-data/{coin_name}_price_data.csv'
+        original_df = pd.read_csv(csv_filename, skiprows=0)
+        now_price = original_df.loc[original_df.index.max()]['Spot']
+
+        print(f'\n== Price reduced by %')
+        for percentage in reduce_percentages:
+            print(f'{int(percentage * 100)}%: ${now_price * (1 - percentage)}')
