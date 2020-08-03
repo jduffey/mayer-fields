@@ -39,24 +39,27 @@ def get_yesterday():
     return datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d')
 
 
+# tested
 def get_date_range(start_date, end_date):
     return [date.strftime('%Y-%m-%d') for date in pd.date_range(start_date, end_date)]
 
 
+# tested
 def get_day_after(date):
     date_formatted = datetime.strptime(date, '%Y-%m-%d')
     return datetime.strftime(date_formatted + timedelta(1), '%Y-%m-%d')
 
 
+# tested
 def format_row(unformatted_row):
     formatted_row = []
     formatted_row.append(unformatted_row[0])
     formatted_row.append('${:,.2f}'.format(float(unformatted_row[1])))
     for i in range(2, len(unformatted_row)):
-        if unformatted_row[i] == '': # skips missing Mayer values
-            formatted_row.append(unformatted_row[i])
-        else:
+        if unformatted_row[i] != '':
             formatted_row.append(float(unformatted_row[i]))
+        else: # avoid ValueError
+            formatted_row.append(unformatted_row[i])
     return formatted_row
 
 
