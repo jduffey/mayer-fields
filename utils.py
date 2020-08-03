@@ -28,11 +28,13 @@ def get_list_of_col_name_from_gsheet(worksheet_name):
     return google_client.open(workbook_name).worksheet(worksheet_name).row_values(1)
 
 
+# tested
 def import_csv_as_list(csv_filename):
     with open(csv_filename, 'r') as f:
         return list(csv.reader(f))
 
 
+# tested
 def get_yesterday():
     return datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d')
 
