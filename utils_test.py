@@ -1,6 +1,7 @@
 import utils
 
 from datetime import date, datetime, timedelta
+import os
 import re
 import uuid
 
@@ -35,9 +36,7 @@ def test_get_date_range():
     start_date = '2020-02-28'
     end_date = '2020-03-01'
 
-    actual = utils.get_date_range(start_date, end_date)
-
-    assert actual == ['2020-02-28', '2020-02-29', '2020-03-01']
+    assert utils.get_date_range(start_date, end_date) == ['2020-02-28', '2020-02-29', '2020-03-01']
 
 
 def test_get_day_after():
@@ -54,6 +53,7 @@ def test_format_row():
 
 
 # TODO: this tests the csv was created, need a test/method to verify values are correct(???)
+# or need to extract the actual calculation part of the method
 def test_generate_mayer_values():
     source_file = 'price_data_test.csv'
     output_file = 'expected_mayer_values.csv'
@@ -72,12 +72,9 @@ def test_generate_mayer_values():
 def test_get_most_recent_date():
     source_file = 'price_data_test.csv'
 
-    actual = utils.get_most_recent_date(source_file)
-
-    assert actual == 'NOW'
+    assert utils.get_most_recent_date(source_file) == 'NOW'
 
 
-# TODO: this test will append and grow the csv every time it's run; need to clean up after test
 def test_append_data_to_csv():
     csv_filename = 'test_sandbox_csv.csv'
     key = str(uuid.uuid4())
@@ -90,3 +87,30 @@ def test_append_data_to_csv():
 
     assert actual[-1][0] == key
     assert actual[-1][1] == val
+
+    reset_sandbox_csv()
+
+
+def test_remove_last_row_from_csv():
+    csv_filename = 'test_sandbox_csv.csv'
+
+    utils.remove_last_row_from_csv(csv_filename)
+
+    actual = utils.import_csv_as_list(csv_filename)
+
+    assert len(actual) == 1
+    assert actual[0] == ['KEY', 'VALUE']
+
+    reset_sandbox_csv()
+
+
+###
+# Helper methods
+###
+
+def reset_sandbox_csv():
+    file_name = 'test_sandbox_csv.csv'
+    os.remove(file_name)
+    with open(file_name, 'a') as f:
+        f.write('KEY,VALUE\n')
+        f.write('a,b\n')

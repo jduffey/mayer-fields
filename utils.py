@@ -179,6 +179,7 @@ def append_data_to_csv(csv_filename, data):
             f.write(f'{key},{data[key]}\n')
 
 
+# tested
 def remove_last_row_from_csv(csv_filename):
     df = pd.read_csv(csv_filename, skiprows=0)
     df.drop(df.tail(1).index, inplace=True)
