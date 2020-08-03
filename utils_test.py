@@ -7,6 +7,7 @@ import uuid
 
 
 date_pattern = re.compile('[\\d]{4}-[\\d]{2}-[\\d]{2}')
+sandbox_csv = 'test_sandbox.csv'
 
 
 def test_import_csv_as_list():
@@ -76,14 +77,13 @@ def test_get_most_recent_date():
 
 
 def test_append_data_to_csv():
-    csv_filename = 'test_sandbox_csv.csv'
     key = str(uuid.uuid4())
     val = str(uuid.uuid4())
     data = {key: val}
 
-    utils.append_data_to_csv(csv_filename, data)
+    utils.append_data_to_csv(sandbox_csv, data)
 
-    actual = utils.import_csv_as_list(csv_filename)
+    actual = utils.import_csv_as_list(sandbox_csv)
 
     assert actual[-1][0] == key
     assert actual[-1][1] == val
@@ -92,11 +92,9 @@ def test_append_data_to_csv():
 
 
 def test_remove_last_row_from_csv():
-    csv_filename = 'test_sandbox_csv.csv'
+    utils.remove_last_row_from_csv(sandbox_csv)
 
-    utils.remove_last_row_from_csv(csv_filename)
-
-    actual = utils.import_csv_as_list(csv_filename)
+    actual = utils.import_csv_as_list(sandbox_csv)
 
     assert len(actual) == 1
     assert actual[0] == ['KEY', 'VALUE']
@@ -109,8 +107,7 @@ def test_remove_last_row_from_csv():
 ###
 
 def reset_sandbox_csv():
-    file_name = 'test_sandbox_csv.csv'
-    os.remove(file_name)
-    with open(file_name, 'a') as f:
+    os.remove(sandbox_csv)
+    with open(sandbox_csv, 'a') as f:
         f.write('KEY,VALUE\n')
         f.write('a,b\n')
