@@ -2,6 +2,7 @@ import utils
 
 from datetime import date, datetime, timedelta
 import re
+import uuid
 
 
 date_pattern = re.compile('[\\d]{4}-[\\d]{2}-[\\d]{2}')
@@ -50,3 +51,42 @@ def test_format_row():
     expected = ['2020-08-01', '$1,234,567.12', 1.2345, '']
 
     assert utils.format_row(unformatted_row) == expected
+
+
+# TODO: this tests the csv was created, need a test/method to verify values are correct(???)
+def test_generate_mayer_values():
+    source_file = 'price_data_test.csv'
+    output_file = 'expected_mayer_values.csv'
+
+    utils.generate_mayer_values(source_file, output_file)
+
+    actual = utils.import_csv_as_list(output_file)
+
+    assert len(actual) == 3671
+    assert actual[0][0] == 'Date'
+    assert actual[0][134] == 'Mayer_1'
+    assert actual[3670][0] == 'NOW'
+    assert actual[3670][134] == '0.9787'
+
+
+def test_get_most_recent_date():
+    source_file = 'price_data_test.csv'
+
+    actual = utils.get_most_recent_date(source_file)
+
+    assert actual == 'NOW'
+
+
+# TODO: this test will append and grow the csv every time it's run; need to clean up after test
+def test_append_data_to_csv():
+    csv_filename = 'test_sandbox_csv.csv'
+    key = str(uuid.uuid4())
+    val = str(uuid.uuid4())
+    data = {key: val}
+
+    utils.append_data_to_csv(csv_filename, data)
+
+    actual = utils.import_csv_as_list(csv_filename)
+
+    assert actual[-1][0] == key
+    assert actual[-1][1] == val

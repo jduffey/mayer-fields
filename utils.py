@@ -70,6 +70,7 @@ def create_output_dir():
         printer.created_directory(output_data_dir)
 
 
+# tested... partially?
 def generate_mayer_values(source_file, output_file):
     create_output_dir()
     printer.generating_mayer_values()
@@ -151,6 +152,7 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
         worksheet.insert_row(price_now_row, first_empty_row_index)
 
 
+# tested
 def get_most_recent_date(csv_filename):
     with open(csv_filename, 'r') as f:
         return list(csv.reader(f))[-1][0]
@@ -170,6 +172,7 @@ def get_price_dict_for_dates(currency_pair, dates):
     return dates_and_prices
 
 
+# tested
 def append_data_to_csv(csv_filename, data):
     with open(csv_filename, 'a') as f:
         for key in data.keys():
