@@ -43,7 +43,7 @@ if __name__ == '__main__':
         for sma_pair in sma_pairs:
             sma_day_range = sma_pair[0]
             target_sma_ratios = sma_pair[1]
-            print(f'SMA Day Range: {sma_day_range}')
+            print(f'\nSMA Day Range: {sma_day_range}')
             print(f'Target SMA ratios: {target_sma_ratios}')
             sma_ratio_value = 0
             csv_filename = f'price-data/{coin_name}_price_data.csv'
