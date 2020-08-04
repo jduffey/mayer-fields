@@ -63,16 +63,16 @@ def format_row(unformatted_row):
     return formatted_row
 
 
-def create_output_dir():
-    output_data_dir = "output-data/"
-    if not path.exists(output_data_dir):
-        mkdir(output_data_dir)
-        printer.created_directory(output_data_dir)
+# tested
+def create_output_dir(output_dir):
+    if not path.exists(output_dir):
+        mkdir(output_dir)
+        printer.created_directory(output_dir)
 
 
 # tested... partially?
 def generate_mayer_values(source_file, output_file):
-    create_output_dir()
+    create_output_dir('output-data/')
     printer.generating_mayer_values()
 
     mayer_ranges.sort(reverse=True)
@@ -91,7 +91,7 @@ def generate_mayer_values(source_file, output_file):
 
 
 def generate_day_ratios(source_file, output_file):
-    create_output_dir()
+    create_output_dir('output-data/')
     printer.generating_day_ratios()
 
     day_ratio_ranges.sort(reverse=True)

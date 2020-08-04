@@ -53,6 +53,16 @@ def test_format_row():
     assert utils.format_row(unformatted_row) == expected
 
 
+def test_create_output_dir():
+    test_dir = 'test-dir/'
+
+    utils.create_output_dir(test_dir)
+
+    assert os.path.isdir(test_dir) == True
+
+    os.removedirs(test_dir)
+
+
 # TODO: this tests the csv was created, need a test/method to verify values are correct(???)
 # or need to extract the actual calculation part of the method
 def test_generate_mayer_values():
