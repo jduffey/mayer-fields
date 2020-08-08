@@ -3,6 +3,7 @@ import printer
 import utils
 import pandas as pd
 import numpy as np
+import coinbase_utils
 
 
 if __name__ == '__main__':
@@ -19,7 +20,7 @@ if __name__ == '__main__':
         day_ratios = coin_vars[coin]['day_ratios']
 
         try:
-            utils.update_price_data(price_data, coin, currency_pair, yesterday)
+            coinbase_utils.update_price_data(price_data, coin, currency_pair, yesterday)
             utils.generate_mayer_values(price_data, mayer_values)
             utils.generate_day_ratios(price_data, day_ratios)
             utils.write_data_to_worksheet(mayer_values, coin_vars[coin]['gsheet_mayer_values'], yesterday)
