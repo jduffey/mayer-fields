@@ -64,7 +64,7 @@ def test_create_output_dir():
 
 
 # TODO: this tests the csv was created, need a test/method to verify values are correct(???)
-# or need to extract the actual calculation part of the method
+# or need to extract the actual calculation part of the method?
 def test_generate_mayer_values():
     source_file = 'price_data_test.csv'
     output_file = 'expected_mayer_values.csv'
@@ -111,10 +111,6 @@ def test_remove_last_row_from_csv():
 
     reset_sandbox_csv()
 
-
-###
-# Helper methods
-###
 
 def reset_sandbox_csv():
     os.remove(sandbox_csv)

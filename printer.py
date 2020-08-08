@@ -70,5 +70,6 @@ def updated_worksheet(worksheet_name, missing_gsheet_dates):
 def writing_data_to_worksheet(worksheet_name):
     print(f'Writing missing data to "{worksheet_name}"...')
 
+
 def hint_vpn():
     print(f'HINT: Are you on a VPN or attempting to connect from a deny-listed IP address?')

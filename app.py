@@ -15,12 +15,12 @@ if __name__ == '__main__':
         printer.initiating_workflow(coin)
 
         price_data = coin_vars[coin]['price_data']
-        currency_pair = coin_vars[coin]['currency_pair']
         mayer_values = coin_vars[coin]['mayer_values']
         day_ratios = coin_vars[coin]['day_ratios']
 
         try:
-            coinbase_utils.update_price_data(price_data, coin, currency_pair, yesterday)
+            now_price = coinbase_utils.get_current_price(coin)
+            coinbase_utils.update_price_data(price_data, coin, yesterday, now_price)
             utils.generate_mayer_values(price_data, mayer_values)
             utils.generate_day_ratios(price_data, day_ratios)
             utils.write_data_to_worksheet(mayer_values, coin_vars[coin]['gsheet_mayer_values'], yesterday)
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         for sma_pair in sma_pairs:
             sma_day_range = sma_pair[0]
             target_sma_ratios = sma_pair[1]
-            print(f'\nSMA Day Range: {sma_day_range}')
+            print(f'\nSMA Day Range: {sma_day_range}\n--------------')
             print(f'Target SMA ratios: {target_sma_ratios}')
             sma_ratio_value = 0
             csv_filename = f'price-data/{coin_name}_price_data.csv'
@@ -86,6 +86,6 @@ if __name__ == '__main__':
         original_df = pd.read_csv(csv_filename, skiprows=0)
         now_price = original_df.loc[original_df.index.max()]['Spot']
 
-        print(f'\n== Price reduced by %')
+        print(f'\nPrice reduced by %\n------------------')
         for percentage in reduce_percentages:
             print(f'{int(percentage * 100)}%: ${now_price * (1 - percentage)}')
