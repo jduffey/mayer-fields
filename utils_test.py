@@ -81,9 +81,8 @@ def test_generate_mayer_values():
 
 
 def test_get_most_recent_date():
-    source_file = 'price_data_test.csv'
-
-    assert utils.get_most_recent_date(source_file) == 'NOW'
+    assert utils.get_most_recent_date('price_data_test.csv') == tuple(['NOW', '2020-08-01'])
+    assert utils.get_most_recent_date('price_data_test_2.csv') == tuple(['2010-07-17'])
 
 
 def test_append_data_to_csv():

@@ -152,12 +152,6 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
 
 
 # tested
-def get_most_recent_date(csv_filename):
-    with open(csv_filename, 'r') as f:
-        return list(csv.reader(f))[-1][0]
-
-
-# tested
 def append_data_to_csv(csv_filename, data):
     with open(csv_filename, 'a') as f:
         for key in data.keys():
@@ -169,3 +163,12 @@ def remove_last_row_from_csv(csv_filename):
     df = pd.read_csv(csv_filename, skiprows=0)
     df.drop(df.tail(1).index, inplace=True)
     df.to_csv(csv_filename, index=False)
+
+
+def get_most_recent_date(price_data_csv):
+    price_data_from_csv = import_csv_as_list(price_data_csv)
+    most_recent_date = price_data_from_csv[-1][0]
+    if most_recent_date == 'NOW':
+        return ('NOW', price_data_from_csv[-2][0])
+    else:
+        return (price_data_from_csv[-1][0],)

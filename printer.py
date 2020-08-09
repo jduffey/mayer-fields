@@ -71,5 +71,6 @@ def writing_data_to_worksheet(worksheet_name):
     print(f'Writing missing data to "{worksheet_name}"...')
 
 
+# TODO: Fix -- this is printing on exceptions not related to this hint
 def hint_vpn():
     print(f'HINT: Are you on a VPN or attempting to connect from a deny-listed IP address?')
