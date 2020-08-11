@@ -35,8 +35,8 @@ if __name__ == '__main__':
     target_sma_ratios = [target_sma_ratio_min + target_sma_ratio_step * x for x in range(11)]
 
     def find_mayer_price(coin):
-        sma_pairs = [(200, [2.4 + 0.1 * x for x in range(11)]),
-                     (30, [1.2, 1.3, 1.4])]
+        sma_pairs = [(200, [2.4 + 0.1 * x for x in range(14)])]#,
+                    #  (30, [1.2, 1.3, 1.4])]
         coin_name = coin[0]
         coin_step = coin[1]
 
@@ -59,6 +59,7 @@ if __name__ == '__main__':
             print(f'Current price rounded down to nearest ${coin_step}: ${now_price}')
             print(f'Current SMA ratio: {current_sma_ratio}\n')
 
+            all_target_sma_prices = []
             for target_sma_ratio in target_sma_ratios:
                 while sma_ratio_value < target_sma_ratio:
                     df = original_df.copy()
@@ -71,8 +72,11 @@ if __name__ == '__main__':
 
                     if target_sma_ratio <= sma_ratio_value:
                         print(f'{coin_name}: ${now_price}: {sma_ratio_value}')
+                        all_target_sma_prices.append([now_price, sma_ratio_value])
 
                     now_price += coin_step
+
+            utils.write_target_sma_values(coin, all_target_sma_prices)
 
     coins = [('BTC', 10), ('ETH', 5)]
     for coin in coins:

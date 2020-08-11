@@ -151,6 +151,13 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
         worksheet.insert_row(price_now_row, first_empty_row_index)
 
 
+def write_target_sma_values(coin, values):
+    worksheet_name = f'{coin[0]} TargetSMAs'
+    worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
+    worksheet.clear()
+    worksheet.update('A1:B14', values)
+
+
 # tested
 def append_data_to_csv(csv_filename, data):
     with open(csv_filename, 'a') as f:
