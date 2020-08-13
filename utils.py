@@ -152,7 +152,7 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
 
 
 def write_target_sma_values(coin, values):
-    worksheet_name = f'{coin[0]} TargetSMAs'
+    worksheet_name = f'{coin[0]}_Target_SMA'
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
     worksheet.clear()
     worksheet.update('A1:B14', values)

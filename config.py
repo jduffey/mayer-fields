@@ -20,7 +20,7 @@ for coin in coins:
             'price_data': f'{price_data_dir}{coin}_price_data.csv',
             'mayer_values': f'{output_data_dir}{coin}_mayer_values.csv',
             'day_ratios': f'{output_data_dir}{coin}_day_ratios.csv',
-            'gsheet_mayer_values': f'{coin} Mayer Multiples',
-            'gsheet_day_ratios': f'{coin} Day Ratios'
+            'gsheet_mayer_values': f'{coin}_SMA_Ratios',
+            'gsheet_day_ratios': f'{coin}_Day_Ratios'
         }
     })
