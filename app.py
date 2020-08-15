@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
             utils.write_target_sma_values(coin, all_target_sma_prices)
 
-    coins = [('BTC', 10), ('ETH', 5)]
+    coins = [('BTC', 5), ('ETH', 1)]
     for coin in coins:
         coin_name = coin[0]
         coin_step = coin[1]
