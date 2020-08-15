@@ -63,6 +63,8 @@ if __name__ == '__main__':
             for target_sma_ratio in target_sma_ratios:
                 while sma_ratio_value < target_sma_ratio:
                     df = original_df.copy()
+                    # Drop existing NOW value so that the testing NOW value can take its place
+                    df.drop(df.tail(1).index,inplace=True)
 
                     df.loc[df.index.max() + 1] = [now_date, now_price]
 
