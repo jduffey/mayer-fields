@@ -34,7 +34,8 @@ if __name__ == '__main__':
     target_sma_ratio_step = 0.1
     target_sma_ratios = [target_sma_ratio_min + target_sma_ratio_step * x for x in range(11)]
 
-    def find_mayer_price(coin):
+
+    def find_mayer_prices(coin):
         sma_pairs = [(200, [2.4 + 0.1 * x for x in range(14)])]#,
                     #  (30, [1.2, 1.3, 1.4])]
         coin_name = coin[0]
@@ -82,17 +83,5 @@ if __name__ == '__main__':
 
     coins = [('BTC', 5), ('ETH', 1)]
     for coin in coins:
-        coin_name = coin[0]
-        coin_step = coin[1]
-
-        find_mayer_price(coin)
-
-        reduce_percentages = np.arange(0.1, 0.51, 0.05).tolist()
-
-        csv_filename = f'price-data/{coin_name}_price_data.csv'
-        original_df = pd.read_csv(csv_filename, skiprows=0)
-        now_price = original_df.loc[original_df.index.max()]['Spot']
-
-        print(f'\nPrice reduced by %\n------------------')
-        for percentage in reduce_percentages:
-            print(f'{int(percentage * 100)}%: ${now_price * (1 - percentage)}')
+        find_mayer_prices(coin)
+        utils.write_time_updated(coin[0])

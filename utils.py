@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from os import path, mkdir
@@ -156,6 +156,13 @@ def write_target_sma_values(coin, values):
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
     worksheet.clear()
     worksheet.update('A1:B14', values)
+
+
+def write_time_updated(coin):
+    worksheet_name = f'Dashboard{coin}'
+    worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
+    current_time = [[f'Updated UTC: {str(datetime.now(timezone.utc))}']]
+    worksheet.update('A1', current_time)
 
 
 # tested
