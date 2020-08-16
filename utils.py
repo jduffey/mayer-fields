@@ -153,6 +153,7 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
 
 def write_target_sma_values(coin, values):
     worksheet_name = f'{coin[0]}_Target_SMA'
+    print(f'Updating values in {worksheet_name}...')
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
     worksheet.clear()
     worksheet.update('A1:B14', values)
@@ -161,7 +162,9 @@ def write_target_sma_values(coin, values):
 def write_time_updated(coin):
     worksheet_name = f'Dashboard{coin}'
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
-    current_time = [[f'Updated UTC: {str(datetime.now(timezone.utc))}']]
+    utc_now = datetime.now(timezone.utc)
+    utc_now_formatted = utc_now.strftime('%Y-%m-%d %H:%M:%S %p')
+    current_time = [[f'Updated: {utc_now_formatted} UTC']]
     worksheet.update('A1', current_time)
 
 
