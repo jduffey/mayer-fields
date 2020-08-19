@@ -6,15 +6,14 @@ from os import path, mkdir
 import pandas as pd
 from time import sleep
 
-from config import mayer_ranges, day_ratio_ranges
+import config
 import printer
 
 
-workbook_name = "Mayer Fields Data"
-google_client_secret_json = 'creds/client_secret.json'
-scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret_json, scope)
+workbook_name = config.google_workbook_name
+google_client_secret = config.google_client_secret
+google_client_scope = config.google_client_scope
+creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret, google_client_scope)
 google_client = gspread.authorize(creds)
 
 
@@ -73,12 +72,12 @@ def generate_mayer_values(source_file, output_file):
     create_output_dir('output-data/')
     printer.generating_mayer_values()
 
-    mayer_ranges.sort(reverse=True)
+    config.mayer_ranges.sort(reverse=True)
     df = pd.read_csv(source_file, skiprows=0)
     df = df.reset_index(drop=True)
 
     mayer_labels = []
-    for mayer_range in mayer_ranges:
+    for mayer_range in config.mayer_ranges:
         mayer_label = f'Mayer_{str(mayer_range)}'
         mayer_labels.append(mayer_label)
         df[mayer_label] = df['Spot']/df['Spot'].rolling(window=(mayer_range + 1)).mean()
@@ -93,12 +92,12 @@ def generate_day_ratios(source_file, output_file):
     create_output_dir('output-data/')
     printer.generating_day_ratios()
 
-    day_ratio_ranges.sort(reverse=True)
+    config.day_ratio_ranges.sort(reverse=True)
     df = pd.read_csv(source_file, skiprows=0)
     df = df.reset_index(drop=True)
 
     day_ratio_labels = []
-    for day_ratio in day_ratio_ranges:
+    for day_ratio in config.day_ratio_ranges:
         day_ratio_label = f'Ratio_{str(day_ratio)}'
         day_ratio_labels.append(day_ratio_label)
         df[day_ratio_label] = df['Spot'] / df['Spot'].shift(day_ratio)

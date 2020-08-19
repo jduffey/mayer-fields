@@ -54,7 +54,8 @@ def test_format_row():
 
 
 def test_create_output_dir():
-    test_dir = 'test-dir/'
+    dir_name = uuid.uuid4()
+    test_dir = f'{dir_name}/'
 
     utils.create_output_dir(test_dir)
 

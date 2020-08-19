@@ -10,6 +10,10 @@ day_ratio_ranges = []
 
 output_data_dir = "output-data/"
 price_data_dir = "price-data/"
+google_workbook_name = "Mayer Fields Data"
+google_client_secret = 'creds/client_secret.json'
+google_client_scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
 
 coins = ['BTC', 'ETH']
 
