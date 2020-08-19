@@ -9,3 +9,5 @@ Google Sheets APIs: https://developers.google.com/sheets/api
 Gspread: https://gspread.readthedocs.io/en/latest/
 
 TODO: add information about how to install, configure, and use the mentioned libraries.
+
+Note: need to add the Google service account as a shared Editor on workbooks

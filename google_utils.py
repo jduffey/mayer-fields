@@ -14,7 +14,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret, g
 google_client = gspread.authorize(creds)
 
 
-def get_list_of_dates_from_gsheet(worksheet_name):
+def get_list_of_dates_from_gsheet(workbook_name, worksheet_name):
     return google_client.open(workbook_name).worksheet(worksheet_name).col_values(1)
 
 
@@ -53,10 +53,10 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
             break
 
     if okay_to_upload:
-        dates_from_gsheet = get_list_of_dates_from_gsheet(worksheet_name)
+        dates_from_gsheet = get_list_of_dates_from_gsheet(workbook_name, worksheet_name)
         if dates_from_gsheet[-1] == 'NOW':
             worksheet.delete_row(len(dates_from_gsheet))
-            dates_from_gsheet = get_list_of_dates_from_gsheet(worksheet_name)
+            dates_from_gsheet = get_list_of_dates_from_gsheet(workbook_name, worksheet_name)
         most_recent_date_in_gsheet = dates_from_gsheet[-1]
         first_empty_row_index = len(dates_from_gsheet) + 1
 
