@@ -37,12 +37,10 @@ def update_price_data(price_data_csv, currency_pair, yesterday, now_price):
         utils.remove_last_row_from_csv(price_data_csv)
     else:
         actual_most_recent_date = most_recent_date_in_price_data[0]
-        print(f'ACTUAL MOST RECENT DATE: {actual_most_recent_date}')
     if actual_most_recent_date < yesterday:
         printer.gathering_missing_price_data(price_data_csv, actual_most_recent_date)
         day_after = utils.get_day_after(actual_most_recent_date)
         missing_price_dates = utils.get_date_range(day_after, yesterday)
-        print(f'Missing price dates: {missing_price_dates}')
         missing_price_data = get_price_dict_for_dates(currency_pair, missing_price_dates)
         utils.append_data_to_csv(price_data_csv, missing_price_data)
         printer.updated_price_data(price_data_csv, missing_price_data)
