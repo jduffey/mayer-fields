@@ -3,6 +3,7 @@ output-data
 price-data
 sandbox
 .vscode/
+price-data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
