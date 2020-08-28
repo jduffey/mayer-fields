@@ -124,10 +124,9 @@ def get_most_recent_date(price_data_csv):
 
 
 def find_mayer_prices(coin):
-    sma_pairs = [(200, [2.4 + 0.1 * x for x in range(14)])]#,
-                #  (30, [1.2, 1.3, 1.4])]
+    sma_pairs = [(200, [2.4 + 0.1 * x for x in range(14)])]
     coin_name = coin[0]
-    coin_step = coin[1]
+    price_step = coin[1]
 
     now_date = 'NOW'
 
@@ -139,13 +138,13 @@ def find_mayer_prices(coin):
         sma_ratio_value = 0
         csv_filename = f'price-data/{coin_name}_price_data.csv'
         original_df = pd.read_csv(csv_filename, skiprows=0)
-        now_price = original_df.loc[original_df.index.max()]['Spot']
-        now_price = now_price - now_price % coin_step
+        current_price = original_df.loc[original_df.index.max()]['Spot']
+        guess_price = current_price - current_price % price_step
         df = original_df.copy()
-        df.loc[df.index.max() + 1] = [now_date, now_price]
+        df.loc[df.index.max() + 1] = [now_date, guess_price]
         current_sma_ratios = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
         current_sma_ratio = current_sma_ratios[current_sma_ratios.index.max()]
-        print(f'Current price rounded down to nearest ${coin_step}: ${now_price}')
+        print(f'Current price rounded down to nearest ${price_step}: ${guess_price}')
         print(f'Current SMA ratio: {current_sma_ratio}\n')
 
         all_target_sma_prices = []
@@ -155,16 +154,16 @@ def find_mayer_prices(coin):
                # Drop existing NOW value so that the testing NOW value can take its place
                df.drop(df.tail(1).index,inplace=True)
 
-               df.loc[df.index.max() + 1] = [now_date, now_price]
+               df.loc[df.index.max() + 1] = [now_date, guess_price]
 
                sma_values = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
 
                sma_ratio_value = sma_values[sma_values.index.max()]
 
                if target_sma_ratio <= sma_ratio_value:
-                   print(f'{coin_name}: ${now_price}: {sma_ratio_value}')
-                   all_target_sma_prices.append([now_price, sma_ratio_value])
+                   print(f'{coin_name}: ${guess_price}: {sma_ratio_value}')
+                   all_target_sma_prices.append([guess_price, sma_ratio_value])
 
-               now_price += coin_step
+               guess_price += price_step
 
         google_utils.write_target_sma_values(coin, all_target_sma_prices)

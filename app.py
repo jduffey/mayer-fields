@@ -22,8 +22,8 @@ if __name__ == '__main__':
         day_ratios = coin_vars[coin_name]['day_ratios']
 
         try:
-            now_price = coinbase_utils.get_current_price(currency_pair)
-            coinbase_utils.update_price_data(price_data, currency_pair, yesterday, now_price)
+            current_price = coinbase_utils.get_current_price(currency_pair)
+            coinbase_utils.update_price_data(price_data, currency_pair, yesterday, current_price)
             utils.generate_mayer_values(price_data, mayer_values)
             utils.generate_day_ratios(price_data, day_ratios)
             google_utils.write_data_to_worksheet(mayer_values, coin_vars[coin_name]['gsheet_mayer_values'], yesterday)

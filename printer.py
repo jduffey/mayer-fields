@@ -10,9 +10,9 @@ def created_file(output_file):
     print(f'Created "{output_file}".\n')
 
 
-def current_price(coin, now_price):
+def current_price(coin, current_price):
     print(f'Current price of {coin}: '
-           '${:,.2f}\n'.format(float(now_price)))
+           '${:,.2f}\n'.format(float(current_price)))
 
 
 def data_differ_no_upload(data, gsheet_col_names, worksheet_name):

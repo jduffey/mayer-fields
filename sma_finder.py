@@ -16,9 +16,9 @@ def find_mayer_price(coin):
         print(f'Target SMA ratios: {target_sma_ratios}')
         sma_ratio_value = 0
 
-        now_price = original_df.loc[original_df.index.max()]['Spot']
+        current_price = original_df.loc[original_df.index.max()]['Spot']
         # Set initial guess price higher than would be realistic for highest target sma_ratio
-        original_guess_price = now_price * 10
+        original_guess_price = current_price * 10
 
         all_target_sma_prices = []
         for target_sma_ratio in target_sma_ratios:
@@ -26,7 +26,7 @@ def find_mayer_price(coin):
             guess_step = original_guess_price / 2
             while abs(target_sma_ratio - sma_ratio_value) > 0.00001:
                 df = original_df.copy() # Reset df
-                add_now_price_to_df(df, now_date, guess_price)
+                add_guess_price_to_df(df, now_date, guess_price)
 
                 sma_ratio_value = get_sma_ratio_value(df, sma_day_range)
 
@@ -46,8 +46,8 @@ def get_sma_ratio_value(df, sma_day_range):
     return sma_values[sma_values.index.max()]
 
 
-def add_now_price_to_df(df, now_date, now_price):
-    df.loc[df.index.max() + 1] = [now_date, now_price]
+def add_guess_price_to_df(df, now_date, guess_price):
+    df.loc[df.index.max() + 1] = [now_date, guess_price]
 
 
 def get_current_sma_ratio(df, sma_day_range):
