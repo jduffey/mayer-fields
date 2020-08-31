@@ -30,12 +30,21 @@ def write_target_sma_values(coin, values):
     worksheet.update('A1:B14', values)
 
 
-def write_time_updated(coin):
-    worksheet_name = f'Dashboard{coin}'
+def write_time_updated(coin_name):
+    worksheet_name = f'Dashboard{coin_name}'
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
     utc_now = datetime.now(timezone.utc)
     utc_now_formatted = utc_now.strftime('%Y-%m-%d %H:%M:%S %p')
     current_time = [[f'Updated: {utc_now_formatted} UTC']]
+    worksheet.update('A1', current_time)
+
+
+def write_updating_notice(coin_name):
+    worksheet_name = f'Dashboard{coin_name}'
+    worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
+    utc_now = datetime.now(timezone.utc)
+    utc_now_formatted = utc_now.strftime('%Y-%m-%d %H:%M:%S %p')
+    current_time = [[f'Notice - Updating... {utc_now_formatted} UTC']]
     worksheet.update('A1', current_time)
 
 
