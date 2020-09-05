@@ -114,7 +114,7 @@ def get_most_recent_date(price_data_csv):
     price_data_from_csv = import_csv_as_list(price_data_csv)
     most_recent_date = price_data_from_csv[-1][0]
     if most_recent_date == 'NOW':
-        return ('NOW', price_data_from_csv[-2][0])
+        return 'NOW', price_data_from_csv[-2][0]
     else:
         return (price_data_from_csv[-1][0],)
 

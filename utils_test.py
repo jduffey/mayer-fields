@@ -58,9 +58,10 @@ def test_create_output_dir():
 
     utils.create_output_dir(test_dir)
 
-    assert os.path.isdir(test_dir) == True
-
-    os.removedirs(test_dir)
+    if os.path.isdir(test_dir):
+        os.removedirs(test_dir)
+    else:
+        assert os.path.isdir(test_dir)
 
 
 # TODO: this tests the csv was created, need a test/method to verify values are correct(???)

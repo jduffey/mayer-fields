@@ -10,11 +10,11 @@ def created_file(output_file):
     print(f'Created "{output_file}".\n')
 
 
-def current_price(coin, current_price):
-    print(f'Current price of {coin}: '
-          '${:,.2f}\n'.format(float(current_price)))
+def current_price(coin, price):
+    print('Current price of ' + coin + '${:,.2f}\n'.format(float(price)))
 
 
+# TODO: this really should be fixed :-|
 def data_differ_no_upload(data, gsheet_col_names, worksheet_name):
     print(f'Column names "{data[0][i]}" and "{gsheet_col_names[i]}" differ; '
           f'data will not be uploaded to "{worksheet_name}".\n')
@@ -55,7 +55,7 @@ def most_recent_date_in_worksheet_not_before_yesterday(worksheet_name, most_rece
 
 
 def no_data_missing_from_price_data(price_data_csv, most_recent_date_in_price_data, yesterday):
-    print(f'Most recent date in "{price_data_csv}" ({most_recent_date_in_price_data}) ' + \
+    print(f'Most recent date in "{price_data_csv}" ({most_recent_date_in_price_data}) '
           f'is not before yesterday ({yesterday}); no data are missing.\n')
 
 

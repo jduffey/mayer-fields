@@ -5,10 +5,10 @@ import coinbase_utils
 import google_utils
 
 
-def update_target_mayer_value_price_and_updated_dashboard(coin):
-    google_utils.write_updating_notice(coin[0])
-    utils.find_mayer_prices(coin)
-    google_utils.write_time_updated(coin[0])
+def update_target_mayer_value_price_and_updated_dashboard(coin_vals):
+    google_utils.write_updating_notice(coin_vals[0])
+    utils.find_mayer_prices(coin_vals)
+    google_utils.write_time_updated(coin_vals[0])
 
 
 if __name__ == '__main__':

@@ -13,8 +13,8 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret, g
 google_client = gspread.authorize(creds)
 
 
-def get_list_of_dates_from_gsheet(workbook_name, worksheet_name):
-    return google_client.open(workbook_name).worksheet(worksheet_name).col_values(1)
+def get_list_of_dates_from_gsheet(workbook, worksheet):
+    return google_client.open(workbook).worksheet(worksheet).col_values(1)
 
 
 def get_list_of_col_name_from_gsheet(worksheet_name):

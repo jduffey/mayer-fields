@@ -24,7 +24,6 @@ def get_price_dict_for_dates(currency_pair, dates):
     return dates_and_prices
 
 
-
 # TODO: The coinbase_utils-dependent parts of this method should be split out and the rest moved to utils.
 # TODO: Need to pass in missing_price_dates and missing_price_data.
 def update_price_data(price_data_csv, currency_pair, yesterday, current_price):
