@@ -1,8 +1,6 @@
 from config import coin_vars
 import printer
 import utils
-import pandas as pd
-import numpy as np
 import coinbase_utils
 import google_utils
 

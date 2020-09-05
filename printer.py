@@ -12,7 +12,7 @@ def created_file(output_file):
 
 def current_price(coin, current_price):
     print(f'Current price of {coin}: '
-           '${:,.2f}\n'.format(float(current_price)))
+          '${:,.2f}\n'.format(float(current_price)))
 
 
 def data_differ_no_upload(data, gsheet_col_names, worksheet_name):
@@ -56,7 +56,7 @@ def most_recent_date_in_worksheet_not_before_yesterday(worksheet_name, most_rece
 
 def no_data_missing_from_price_data(price_data_csv, most_recent_date_in_price_data, yesterday):
     print(f'Most recent date in "{price_data_csv}" ({most_recent_date_in_price_data}) ' + \
-              f'is not before yesterday ({yesterday}); no data are missing.\n')
+          f'is not before yesterday ({yesterday}); no data are missing.\n')
 
 
 def updated_price_data(price_data_csv, missing_price_data):

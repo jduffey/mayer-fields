@@ -13,18 +13,18 @@ price_data_dir = "price-data/"
 google_workbook_name = "Mayer Fields Data"
 google_client_secret = 'creds/client_secret.json'
 google_client_scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
+                       'https://www.googleapis.com/auth/drive']
 
 coins = ['BTC', 'ETH']
 
 coin_vars = {}
 for coin in coins:
     coin_vars.update(
-        {coin : {
+        {coin: {
             'price_data': f'{price_data_dir}{coin}_price_data.csv',
             'mayer_values': f'{output_data_dir}{coin}_mayer_values.csv',
             'day_ratios': f'{output_data_dir}{coin}_day_ratios.csv',
             'gsheet_mayer_values': f'{coin}_SMA_Ratios',
             'gsheet_day_ratios': f'{coin}_Day_Ratios'
         }
-    })
+        })

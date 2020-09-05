@@ -1,7 +1,7 @@
-import config
-from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-import uuid
+from oauth2client.service_account import ServiceAccountCredentials
+
+import config
 import google_utils
 
 TEST_WORKBOOK = 'Mayer Fields Test'

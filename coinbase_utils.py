@@ -1,9 +1,7 @@
 from coinbase.wallet.client import Client
-from oauth2client.service_account import ServiceAccountCredentials
-import gspread
+
 import printer
 import utils
-
 
 coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>')
 
@@ -26,10 +24,9 @@ def get_price_dict_for_dates(currency_pair, dates):
     return dates_and_prices
 
 
-'''
-The coinbase_utils-dependent parts of this method should be split out and the rest moved to utils.
-Need to pass in missing_price_dates and missing_price_data.
-'''
+
+# TODO: The coinbase_utils-dependent parts of this method should be split out and the rest moved to utils.
+# TODO: Need to pass in missing_price_dates and missing_price_data.
 def update_price_data(price_data_csv, currency_pair, yesterday, current_price):
     most_recent_date_in_price_data = utils.get_most_recent_date(price_data_csv)
     if most_recent_date_in_price_data[0] == 'NOW':

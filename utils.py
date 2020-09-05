@@ -1,15 +1,13 @@
 import csv
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from os import path, mkdir
 import pandas as pd
-from time import sleep
 import google_utils
 
 import config
 import printer
-
 
 workbook_name = config.google_workbook_name
 google_client_secret = config.google_client_secret
@@ -42,13 +40,11 @@ def get_day_after(date):
 
 # tested
 def format_row(unformatted_row):
-    formatted_row = []
-    formatted_row.append(unformatted_row[0])
-    formatted_row.append('${:,.2f}'.format(float(unformatted_row[1])))
+    formatted_row = [unformatted_row[0], '${:,.2f}'.format(float(unformatted_row[1]))]
     for i in range(2, len(unformatted_row)):
         if unformatted_row[i] != '':
             formatted_row.append(float(unformatted_row[i]))
-        else: # avoid ValueError
+        else:  # avoid ValueError
             formatted_row.append(unformatted_row[i])
     return formatted_row
 
@@ -73,7 +69,7 @@ def generate_mayer_values(source_file, output_file):
     for mayer_range in config.mayer_ranges:
         mayer_label = f'Mayer_{str(mayer_range)}'
         mayer_labels.append(mayer_label)
-        df[mayer_label] = df['Spot']/df['Spot'].rolling(window=(mayer_range + 1)).mean()
+        df[mayer_label] = df['Spot'] / df['Spot'].rolling(window=(mayer_range + 1)).mean()
 
     df = df.round(4)
     df.to_csv(output_file, index=False)
@@ -142,28 +138,28 @@ def find_mayer_prices(coin):
         guess_price = current_price - current_price % price_step
         df = original_df.copy()
         df.loc[df.index.max() + 1] = [now_date, guess_price]
-        current_sma_ratios = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
+        current_sma_ratios = df['Spot'] / df['Spot'].rolling(window=(sma_day_range + 1)).mean()
         current_sma_ratio = current_sma_ratios[current_sma_ratios.index.max()]
         print(f'Current price rounded down to nearest ${price_step}: ${guess_price}')
         print(f'Current SMA ratio: {current_sma_ratio}\n')
 
         all_target_sma_prices = []
         for target_sma_ratio in target_sma_ratios:
-           while sma_ratio_value < target_sma_ratio:
-               df = original_df.copy()
-               # Drop existing NOW value so that the testing NOW value can take its place
-               df.drop(df.tail(1).index,inplace=True)
+            while sma_ratio_value < target_sma_ratio:
+                df = original_df.copy()
+                # Drop existing NOW value so that the testing NOW value can take its place
+                df.drop(df.tail(1).index, inplace=True)
 
-               df.loc[df.index.max() + 1] = [now_date, guess_price]
+                df.loc[df.index.max() + 1] = [now_date, guess_price]
 
-               sma_values = df['Spot']/df['Spot'].rolling(window=(sma_day_range + 1)).mean()
+                sma_values = df['Spot'] / df['Spot'].rolling(window=(sma_day_range + 1)).mean()
 
-               sma_ratio_value = sma_values[sma_values.index.max()]
+                sma_ratio_value = sma_values[sma_values.index.max()]
 
-               if target_sma_ratio <= sma_ratio_value:
-                   print(f'{coin_name}: ${guess_price}: {sma_ratio_value}')
-                   all_target_sma_prices.append([guess_price, sma_ratio_value])
+                if target_sma_ratio <= sma_ratio_value:
+                    print(f'{coin_name}: ${guess_price}: {sma_ratio_value}')
+                    all_target_sma_prices.append([guess_price, sma_ratio_value])
 
-               guess_price += price_step
+                guess_price += price_step
 
         google_utils.write_target_sma_values(coin, all_target_sma_prices)

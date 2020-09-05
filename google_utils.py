@@ -6,7 +6,6 @@ import printer
 import utils
 from time import sleep
 
-
 workbook_name = config.google_workbook_name
 google_client_secret = config.google_client_secret
 google_client_scope = config.google_client_scope
@@ -79,13 +78,14 @@ def write_data_to_worksheet(csv_filename, worksheet_name, yesterday):
                         formatted_row = utils.format_row(row)
                         print(formatted_row[0:2])
                         worksheet.insert_row(formatted_row, first_empty_row_index)
-                        sleep(2) # don't anger the Google API gods
+                        sleep(2)  # don't anger the Google API gods
                         first_empty_row_index += 1
             # TODO: if price data cannot be retrieved and this step is allowed to continue
             #       it will still report that n records have been updated
             printer.updated_worksheet(worksheet_name, missing_gsheet_dates)
         else:
-            printer.most_recent_date_in_worksheet_not_before_yesterday(worksheet_name, most_recent_date_in_gsheet, yesterday)
+            printer.most_recent_date_in_worksheet_not_before_yesterday(worksheet_name, most_recent_date_in_gsheet,
+                                                                       yesterday)
 
         price_now_row = utils.format_row(data[-1])
         worksheet.insert_row(price_now_row, first_empty_row_index)
