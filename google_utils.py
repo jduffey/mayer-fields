@@ -21,8 +21,8 @@ def get_list_of_col_name_from_gsheet(worksheet_name):
     return google_client.open(workbook_name).worksheet(worksheet_name).row_values(1)
 
 
-def write_target_sma_values(coin, values):
-    worksheet_name = f'{coin[0]}_Target_SMA'
+def write_target_sma_values(coin_name, values):
+    worksheet_name = f'{coin_name}_Target_SMA'
     print(f'Updating values in {worksheet_name}...')
     worksheet = google_client.open(workbook_name).worksheet(worksheet_name)
     worksheet.clear()

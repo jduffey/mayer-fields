@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 from datetime import date, datetime
+import pandas as pd
 
 import utils
 
@@ -93,6 +94,16 @@ def test_find_target_sma_ratio_price():
     actual = utils.find_target_sma_ratio_price(prev_daily_prices, target_sma_ratio)
 
     assert actual == 45
+
+
+def test_my_foo():
+    csv_filename = f'price-data/BTC_price_data.csv'
+
+    df = pd.read_csv(csv_filename, skiprows=0)
+
+    spot_list = utils.get_previous_199_prices(df)
+
+    print(spot_list)
 
 
 def test_append_data_to_csv():
