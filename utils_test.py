@@ -86,6 +86,15 @@ def test_get_most_recent_date():
     assert utils.get_most_recent_date('price_data_test_2.csv') == tuple(['2010-07-17'])
 
 
+def test_find_target_sma_ratio_price():
+    prev_daily_prices = [10, 10, 10]
+    target_sma_ratio = 2.4
+
+    actual = utils.find_target_sma_ratio_price(prev_daily_prices, target_sma_ratio)
+
+    assert actual == 45
+
+
 def test_append_data_to_csv():
     key = str(uuid.uuid4())
     val = str(uuid.uuid4())

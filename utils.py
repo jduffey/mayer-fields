@@ -56,7 +56,7 @@ def create_output_dir(output_dir):
         printer.created_directory(output_dir)
 
 
-# tested... partially? To what extent should we test the actaul values?
+# tested... partially? To what extent should we test the actual values?
 def generate_mayer_values(source_file, output_file):
     create_output_dir('output-data/')
     printer.generating_mayer_values()
@@ -117,6 +117,14 @@ def get_most_recent_date(price_data_csv):
         return 'NOW', price_data_from_csv[-2][0]
     else:
         return (price_data_from_csv[-1][0],)
+
+
+"""
+Take list of previous daily prices and target SMA ratio.
+E.g. for finding SMA200 target ratio, take the previous 199 daily prices.
+"""
+def find_target_sma_ratio_price(prev_daily_prices, target_sma_ratio):
+    return target_sma_ratio * sum(prev_daily_prices) / ( (len(prev_daily_prices) + 1 - target_sma_ratio) )
 
 
 def find_mayer_prices(coin):
