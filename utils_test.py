@@ -96,14 +96,13 @@ def test_find_target_sma_ratio_price():
     assert actual == 45
 
 
-def test_my_foo():
-    csv_filename = f'price-data/BTC_price_data.csv'
+def test_get_previous_199_prices():
+    data = [x for x in range(1, 201)]
+    df = pd.DataFrame(data, columns=['Spot'])
 
-    df = pd.read_csv(csv_filename, skiprows=0)
+    actual = utils.get_previous_199_prices(df)
 
-    spot_list = utils.get_previous_199_prices(df)
-
-    print(spot_list)
+    assert actual == [x for x in range(1, 200)]
 
 
 def test_append_data_to_csv():
