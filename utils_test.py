@@ -6,7 +6,6 @@ import pandas as pd
 
 import utils
 
-date_pattern = re.compile('[\\d]{4}-[\\d]{2}-[\\d]{2}')
 sandbox_csv = 'test_sandbox.csv'
 
 
@@ -19,6 +18,7 @@ def test_import_csv_as_list():
 
 
 def test_get_yesterday():
+    date_pattern = re.compile('[\\d]{4}-[\\d]{2}-[\\d]{2}')
     today = datetime.strftime(datetime.now(), '%Y-%m-%d')
 
     actual = utils.get_yesterday()
