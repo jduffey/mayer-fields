@@ -12,12 +12,9 @@ def update_target_mayer_value_price_and_updated_dashboard(coin_name):
 
 
 if __name__ == '__main__':
-    target_sma_ratio_min = 2.4
-    target_sma_ratio_step = 0.1
-    target_sma_ratios = [target_sma_ratio_min + target_sma_ratio_step * x for x in range(11)]
     yesterday = utils.get_yesterday()
-
     coins = ['BTC', 'ETH']
+
     for coin in coins:
         printer.initiating_workflow(coin)
 

@@ -96,13 +96,14 @@ def test_find_target_sma_ratio_price():
     assert actual == 45
 
 
-def test_get_previous_199_prices():
-    data = [x for x in range(1, 201)]
+def test_get_previous_prices_for_sma_range():
+    sma_range = 200
+    data = [x for x in range(1, sma_range + 1)]
     df = pd.DataFrame(data, columns=['Spot'])
 
-    actual = utils.get_previous_199_prices(df)
+    actual = utils.get_previous_prices_for_sma_range(df, sma_range)
 
-    assert actual == [x for x in range(1, 200)]
+    assert actual == [x for x in range(1, sma_range)]
 
 
 def test_append_data_to_csv():

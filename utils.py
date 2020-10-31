@@ -126,17 +126,18 @@ def find_target_sma_ratio_price(prev_daily_prices, target_sma_ratio):
 
 # TODO: generalize this
 # tested
-def get_previous_199_prices(df):
-    return df['Spot'].tolist()[-200:-1]
+def get_previous_prices_for_sma_range(df, sma_range):
+    return df['Spot'].tolist()[-sma_range:-1]
 
 
 def find_mayer_prices(coin_name):
+    sma_range = 200
     target_sma_ratios = [2.4 + 0.1 * x for x in range(14)]
     csv_filename = f'price-data/{coin_name}_price_data.csv'
 
     df = pd.read_csv(csv_filename, skiprows=0)
 
-    prev_prices = get_previous_199_prices(df)
+    prev_prices = get_previous_prices_for_sma_range(df, sma_range)
 
     all_target_sma_prices = []
 
