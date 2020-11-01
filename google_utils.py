@@ -1,10 +1,12 @@
-import config
-from oauth2client.service_account import ServiceAccountCredentials
-import gspread
 from datetime import datetime, timezone
+from time import sleep
+
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+import config
 import printer
 import utils
-from time import sleep
 
 workbook_name = config.google_workbook_name
 google_client_secret = config.google_client_secret

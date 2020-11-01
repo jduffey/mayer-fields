@@ -1,12 +1,13 @@
 import csv
 from datetime import datetime, timedelta
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 from os import path, mkdir
+
+import gspread
 import pandas as pd
-import google_utils
+from oauth2client.service_account import ServiceAccountCredentials
 
 import config
+import google_utils
 import printer
 
 workbook_name = config.google_workbook_name

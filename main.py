@@ -1,8 +1,8 @@
-from config import coin_vars
-import printer
-import utils
 import coinbase_utils
 import google_utils
+import printer
+import utils
+from config import coin_vars
 
 
 def update_target_mayer_value_price_and_updated_dashboard(coin_name):
