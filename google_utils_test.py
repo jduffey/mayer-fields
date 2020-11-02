@@ -4,8 +4,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 import config
 import google_utils
 
-TEST_WORKBOOK = 'Mayer Fields Test'
 
+TEST_WORKBOOK = 'Mayer Fields Test'
 google_client_secret = config.google_client_secret
 google_client_scope = config.google_client_scope
 creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret, google_client_scope)

@@ -3,6 +3,7 @@ from coinbase.wallet.client import Client
 import printer
 import utils
 
+
 coinbase_client = Client('<KEY_NOT_NEEDED>', '<SECRET_NOT_NEEDED>')
 
 
