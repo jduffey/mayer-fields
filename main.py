@@ -3,7 +3,7 @@ import google_utils
 import printer
 import utils
 from config import coin_vars
-
+import sys
 
 def update_target_mayer_value_price_and_updated_dashboard(coin_name):
     google_utils.write_updating_notice(coin_name)
@@ -12,6 +12,9 @@ def update_target_mayer_value_price_and_updated_dashboard(coin_name):
 
 
 if __name__ == '__main__':
+    google_utils.format_sheets()
+    sys.exit()
+
     yesterday = utils.get_yesterday()
     coins = ['BTC', 'ETH']
 
@@ -34,3 +37,4 @@ if __name__ == '__main__':
         except Exception as error:
             printer.exception_encountered(error, coin)
             printer.hint_vpn()
+

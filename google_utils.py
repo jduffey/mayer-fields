@@ -16,6 +16,13 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(google_client_secret, g
 google_client = gspread.authorize(creds)
 
 
+def format_sheets():
+    sh = google_client.open('Mayer Fields Data')
+    worksheet = sh.worksheet('BTC_SMA_Ratios')
+    print(f'All worksheets: {sh.worksheets()}')
+    worksheet.format('B2:B', {"numberFormat": {"type": "CURRENCY"}})
+
+
 def get_list_of_dates_from_gsheet(workbook, worksheet):
     return google_client.open(workbook).worksheet(worksheet).col_values(1)
 
