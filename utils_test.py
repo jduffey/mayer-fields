@@ -1,7 +1,7 @@
 import os
 import re
 import uuid
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 import pandas as pd
 
@@ -21,7 +21,7 @@ def test_import_csv_as_list():
 
 def test_get_yesterday():
     date_pattern = re.compile('[\\d]{4}-[\\d]{2}-[\\d]{2}')
-    today = datetime.strftime(datetime.now(), '%Y-%m-%d')
+    today = datetime.now(timezone.utc).strftime(utils.DATE_FORMAT)
 
     actual = utils.get_yesterday()
 

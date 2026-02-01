@@ -15,6 +15,8 @@ google_client_secret = 'creds/client_secret.json'
 google_client_scope = ['https://spreadsheets.google.com/feeds',
                        'https://www.googleapis.com/auth/drive']
 
+coinbase_max_window_days = 300
+
 coins = ['BTC', 'ETH']
 
 coin_vars = {}
