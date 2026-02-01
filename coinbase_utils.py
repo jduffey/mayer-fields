@@ -1,9 +1,9 @@
-from datetime import datetime
 import time
 
 import requests
 from coinbase.wallet.client import Client
 
+import domain
 import printer
 import utils
 
@@ -23,11 +23,14 @@ def get_current_price(currency_pair):
 
 def get_price_history(asset, quote, start_date, end_date):
     product_id = f'{asset}-{quote}'
-    start_timestamp = f'{start_date}T00:00:00Z'
-    end_timestamp = f'{end_date}T00:00:00Z'
+    time_range = domain.TimeRange.from_dates(start_date, end_date)
 
-    response, error = _fetch_candles(product_id, start_timestamp, end_timestamp)
-    history = {'product': product_id, 'granularity': DAILY_GRANULARITY_SECONDS, 'candles': []}
+    response, error = _fetch_candles(product_id, time_range.start_iso(), time_range.end_iso())
+    history = {
+        'product': product_id,
+        'granularity': DAILY_GRANULARITY_SECONDS,
+        'candles': [],
+    }
 
     if error:
         history['error'] = error
@@ -42,21 +45,19 @@ def get_price_history(asset, quote, start_date, end_date):
     if not candles:
         return history
 
-    for candle in candles:
-        # Coinbase Exchange candle format: [time, low, high, open, close, volume]
-        time_epoch = candle[0]
-        history['candles'].append({
-            'date': datetime.utcfromtimestamp(time_epoch).strftime('%Y-%m-%d'),
-            'time': time_epoch,
-            'open': candle[3],
-            'high': candle[2],
-            'low': candle[1],
-            'close': candle[4],
-            'volume': candle[5],
-        })
+    try:
+        normalized_candles = domain.normalize_coinbase_candles(candles)
+    except ValueError as error:
+        history['error'] = {'status': response.status_code, 'message': str(error)}
+        return history
 
-    history['candles'].sort(key=lambda entry: entry['time'])
-    return history
+    series = domain.Series(
+        asset=asset,
+        quote=quote,
+        granularity=DAILY_GRANULARITY_SECONDS,
+        candles=normalized_candles,
+    )
+    return series.to_history()
 
 
 def get_spot_price_for_date(currency_pair, date):
@@ -117,6 +118,9 @@ def _fetch_candles(product_id, start_timestamp, end_timestamp):
         try:
             response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT_SECONDS)
         except requests.RequestException as error:
+            if attempt < MAX_RETRIES:
+                time.sleep(BACKOFF_SECONDS * (2 ** attempt))
+                continue
             return None, {'message': 'Request failed', 'details': str(error)}
 
         if response.status_code == 200:
