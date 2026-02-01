@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from os import path, mkdir
 
 import gspread
@@ -26,7 +26,8 @@ def import_csv_as_list(csv_filename):
 
 # tested
 def get_yesterday():
-    return datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d')
+    utc_now = datetime.now(timezone.utc)
+    return datetime.strftime(utc_now - timedelta(1), '%Y-%m-%d')
 
 
 # tested

@@ -68,6 +68,24 @@ def test_get_price_history_empty_results(monkeypatch):
     assert history.get('error') is None
 
 
+def test_get_price_history_skips_invalid_candles(monkeypatch):
+    candles = [
+        [1609459200, 800.0, 1000.0, 900.0, 950.0, 10.0],
+        [1609545600, 900.0, 1100.0, 950.0, 1000.0],  # missing volume
+    ]
+
+    monkeypatch.setattr(
+        coinbase_utils.requests,
+        'get',
+        lambda url, params, timeout: FakeResponse(200, candles),
+    )
+
+    history = coinbase_utils.get_price_history('ETH', 'USD', '2021-01-01', '2021-01-03')
+
+    assert len(history['candles']) == 1
+    assert history['candles'][0]['time'] == 1609459200
+
+
 def test_get_price_history_non_200(monkeypatch):
     call_count = {'count': 0}
 

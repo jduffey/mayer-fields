@@ -1,9 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timezone
+import random
 import time
 
 import requests
 from coinbase.wallet.client import Client
 
+from domain import Series, TimeRange, parse_coinbase_candles
 import printer
 import utils
 
@@ -23,8 +25,9 @@ def get_current_price(currency_pair):
 
 def get_price_history(asset, quote, start_date, end_date):
     product_id = f'{asset}-{quote}'
-    start_timestamp = f'{start_date}T00:00:00Z'
-    end_timestamp = f'{end_date}T00:00:00Z'
+    date_range = _build_utc_date_range(start_date, end_date)
+    start_timestamp = date_range.start.isoformat().replace('+00:00', 'Z')
+    end_timestamp = date_range.end.isoformat().replace('+00:00', 'Z')
 
     response, error = _fetch_candles(product_id, start_timestamp, end_timestamp)
     history = {'product': product_id, 'granularity': DAILY_GRANULARITY_SECONDS, 'candles': []}
@@ -42,20 +45,15 @@ def get_price_history(asset, quote, start_date, end_date):
     if not candles:
         return history
 
-    for candle in candles:
-        # Coinbase Exchange candle format: [time, low, high, open, close, volume]
-        time_epoch = candle[0]
-        history['candles'].append({
-            'date': datetime.utcfromtimestamp(time_epoch).strftime('%Y-%m-%d'),
-            'time': time_epoch,
-            'open': candle[3],
-            'high': candle[2],
-            'low': candle[1],
-            'close': candle[4],
-            'volume': candle[5],
-        })
+    parsed_candles = parse_coinbase_candles(candles)
+    series = Series(
+        asset=asset,
+        quote=quote,
+        granularity=DAILY_GRANULARITY_SECONDS,
+        candles=parsed_candles,
+    ).sorted()
 
-    history['candles'].sort(key=lambda entry: entry['time'])
+    history.update(series.to_dict())
     return history
 
 
@@ -123,7 +121,7 @@ def _fetch_candles(product_id, start_timestamp, end_timestamp):
             return response, None
 
         if response.status_code in RETRY_STATUSES and attempt < MAX_RETRIES:
-            time.sleep(BACKOFF_SECONDS * (2 ** attempt))
+            _sleep_with_backoff(attempt)
             continue
 
         return response, {
@@ -133,3 +131,15 @@ def _fetch_candles(product_id, start_timestamp, end_timestamp):
         }
 
     return None, {'message': 'Request retries exhausted'}
+
+
+def _build_utc_date_range(start_date, end_date):
+    start_dt = datetime.strptime(start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+    end_dt = datetime.strptime(end_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+    return TimeRange(start=start_dt, end=end_dt)
+
+
+def _sleep_with_backoff(attempt):
+    backoff = BACKOFF_SECONDS * (2 ** attempt)
+    jitter = random.uniform(0, BACKOFF_SECONDS)
+    time.sleep(backoff + jitter)
