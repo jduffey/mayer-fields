@@ -67,6 +67,8 @@ def get_spot_price_for_date(currency_pair, date):
         raise RuntimeError(f"Failed to fetch price data: {history['error']}")
     if not history['candles']:
         raise ValueError(f'No candle data available for {currency_pair} on {date}')
+    if history['candles'][0]['date'] != date:
+        raise ValueError(f'No candle data available for {currency_pair} on {date}')
     return history['candles'][0]['close']
 
 

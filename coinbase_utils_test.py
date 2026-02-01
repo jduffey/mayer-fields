@@ -82,3 +82,30 @@ def test_get_price_history_non_200(monkeypatch):
 
     assert history['error']['status'] == 500
     assert call_count['count'] == coinbase_utils.MAX_RETRIES + 1
+
+
+def test_get_spot_price_for_date_mismatched_candle_date(monkeypatch):
+    def fake_get_price_history(asset, quote, start_date, end_date):
+        return {
+            'product': f'{asset}-{quote}',
+            'granularity': coinbase_utils.DAILY_GRANULARITY_SECONDS,
+            'candles': [
+                {
+                    'date': '2020-01-02',
+                    'time': 1577923200,
+                    'open': 1,
+                    'high': 2,
+                    'low': 0.5,
+                    'close': 1.5,
+                    'volume': 100,
+                }
+            ],
+        }
+
+    monkeypatch.setattr(coinbase_utils, 'get_price_history', fake_get_price_history)
+
+    try:
+        coinbase_utils.get_spot_price_for_date('BTC-USD', '2020-01-01')
+        assert False, 'Expected ValueError for mismatched candle date'
+    except ValueError as error:
+        assert 'No candle data available' in str(error)
