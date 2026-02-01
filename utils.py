@@ -26,7 +26,7 @@ def import_csv_as_list(csv_filename):
 
 # tested
 def get_yesterday():
-    return datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d')
+    return datetime.strftime(datetime.utcnow() - timedelta(1), '%Y-%m-%d')
 
 
 # tested

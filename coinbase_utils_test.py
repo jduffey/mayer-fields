@@ -109,3 +109,26 @@ def test_get_spot_price_for_date_mismatched_candle_date(monkeypatch):
         assert False, 'Expected ValueError for mismatched candle date'
     except ValueError as error:
         assert 'No candle data available' in str(error)
+
+
+def test_build_date_windows_splits_range():
+    windows = coinbase_utils._build_date_windows('2021-01-01', '2021-01-10', 3)
+
+    assert windows == [
+        ('2021-01-01', '2021-01-04'),
+        ('2021-01-04', '2021-01-07'),
+        ('2021-01-07', '2021-01-10'),
+    ]
+
+
+def test_sort_and_dedupe_candles():
+    candles = [
+        {'time': 2, 'close': 100},
+        {'time': 1, 'close': 90},
+        {'time': 2, 'close': 110},
+    ]
+
+    sorted_candles = coinbase_utils._sort_and_dedupe_candles(candles)
+
+    assert [candle['time'] for candle in sorted_candles] == [1, 2]
+    assert sorted_candles[1]['close'] == 110

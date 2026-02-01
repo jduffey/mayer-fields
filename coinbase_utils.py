@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 
 import requests
@@ -15,6 +15,7 @@ RETRY_STATUSES = {429, 500, 502, 503, 504}
 MAX_RETRIES = 3
 BACKOFF_SECONDS = 0.5
 REQUEST_TIMEOUT_SECONDS = 10
+MAX_WINDOW_DAYS = 300
 
 
 def get_current_price(currency_pair):
@@ -23,39 +24,27 @@ def get_current_price(currency_pair):
 
 def get_price_history(asset, quote, start_date, end_date):
     product_id = f'{asset}-{quote}'
-    start_timestamp = f'{start_date}T00:00:00Z'
-    end_timestamp = f'{end_date}T00:00:00Z'
-
-    response, error = _fetch_candles(product_id, start_timestamp, end_timestamp)
+    windows = _build_date_windows(start_date, end_date, MAX_WINDOW_DAYS)
     history = {'product': product_id, 'granularity': DAILY_GRANULARITY_SECONDS, 'candles': []}
 
-    if error:
-        history['error'] = error
-        return history
+    for window_start, window_end in windows:
+        start_timestamp = f'{window_start}T00:00:00Z'
+        end_timestamp = f'{window_end}T00:00:00Z'
 
-    try:
-        candles = response.json()
-    except ValueError:
-        history['error'] = {'status': response.status_code, 'message': 'Invalid JSON response'}
-        return history
+        response, error = _fetch_candles(product_id, start_timestamp, end_timestamp)
+        if error:
+            history['error'] = error
+            return history
 
-    if not candles:
-        return history
+        try:
+            candles = response.json()
+        except ValueError:
+            history['error'] = {'status': response.status_code, 'message': 'Invalid JSON response'}
+            return history
 
-    for candle in candles:
-        # Coinbase Exchange candle format: [time, low, high, open, close, volume]
-        time_epoch = candle[0]
-        history['candles'].append({
-            'date': datetime.utcfromtimestamp(time_epoch).strftime('%Y-%m-%d'),
-            'time': time_epoch,
-            'open': candle[3],
-            'high': candle[2],
-            'low': candle[1],
-            'close': candle[4],
-            'volume': candle[5],
-        })
+        history['candles'].extend(_normalize_candles(candles))
 
-    history['candles'].sort(key=lambda entry: entry['time'])
+    history['candles'] = _sort_and_dedupe_candles(history['candles'])
     return history
 
 
@@ -133,3 +122,43 @@ def _fetch_candles(product_id, start_timestamp, end_timestamp):
         }
 
     return None, {'message': 'Request retries exhausted'}
+
+
+def _normalize_candles(candles):
+    normalized = []
+    for candle in candles or []:
+        # Coinbase Exchange candle format: [time, low, high, open, close, volume]
+        time_epoch = candle[0]
+        normalized.append({
+            'date': datetime.utcfromtimestamp(time_epoch).strftime('%Y-%m-%d'),
+            'time': time_epoch,
+            'open': candle[3],
+            'high': candle[2],
+            'low': candle[1],
+            'close': candle[4],
+            'volume': candle[5],
+        })
+    return normalized
+
+
+def _sort_and_dedupe_candles(candles):
+    deduped = {}
+    for candle in candles:
+        deduped[candle['time']] = candle
+    return [deduped[time_epoch] for time_epoch in sorted(deduped)]
+
+
+def _build_date_windows(start_date, end_date, max_days):
+    if max_days <= 0:
+        raise ValueError('max_days must be positive')
+    start = datetime.strptime(start_date, '%Y-%m-%d')
+    end = datetime.strptime(end_date, '%Y-%m-%d')
+    if end < start:
+        raise ValueError('end_date must be on or after start_date')
+    windows = []
+    current = start
+    while current < end:
+        window_end = min(current + timedelta(days=max_days), end)
+        windows.append((current.strftime('%Y-%m-%d'), window_end.strftime('%Y-%m-%d')))
+        current = window_end
+    return windows
