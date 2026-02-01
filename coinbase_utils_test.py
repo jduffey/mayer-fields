@@ -35,6 +35,23 @@ def test_get_price_history_parses_and_sorts(monkeypatch):
     assert history['candles'][0]['volume'] == 10.0
 
 
+def test_get_price_history_filters_to_range(monkeypatch):
+    candles = [
+        [1609459200, 800.0, 1000.0, 900.0, 950.0, 10.0],  # 2021-01-01
+        [1609545600, 900.0, 1100.0, 950.0, 1000.0, 12.5],  # 2021-01-02
+        [1609632000, 950.0, 1150.0, 1000.0, 1100.0, 15.0],  # 2021-01-03
+    ]
+
+    def fake_get(url, params, timeout):
+        return FakeResponse(200, candles)
+
+    monkeypatch.setattr(coinbase_utils.requests, 'get', fake_get)
+
+    history = coinbase_utils.get_price_history('BTC', 'USD', '2021-01-01', '2021-01-03')
+
+    assert [entry['date'] for entry in history['candles']] == ['2021-01-01', '2021-01-02']
+
+
 def test_get_price_history_builds_day_boundary_params(monkeypatch):
     captured = {}
 

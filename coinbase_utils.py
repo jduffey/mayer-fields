@@ -1,9 +1,10 @@
-from datetime import datetime
+import random
 import time
 
 import requests
 from coinbase.wallet.client import Client
 
+from domain import Candle, Series, TimeRange, parse_utc_date
 import printer
 import utils
 
@@ -23,6 +24,7 @@ def get_current_price(currency_pair):
 
 def get_price_history(asset, quote, start_date, end_date):
     product_id = f'{asset}-{quote}'
+    time_range = TimeRange(parse_utc_date(start_date), parse_utc_date(end_date))
     start_timestamp = f'{start_date}T00:00:00Z'
     end_timestamp = f'{end_date}T00:00:00Z'
 
@@ -42,20 +44,13 @@ def get_price_history(asset, quote, start_date, end_date):
     if not candles:
         return history
 
-    for candle in candles:
-        # Coinbase Exchange candle format: [time, low, high, open, close, volume]
-        time_epoch = candle[0]
-        history['candles'].append({
-            'date': datetime.utcfromtimestamp(time_epoch).strftime('%Y-%m-%d'),
-            'time': time_epoch,
-            'open': candle[3],
-            'high': candle[2],
-            'low': candle[1],
-            'close': candle[4],
-            'volume': candle[5],
-        })
+    try:
+        series = _normalize_coinbase_candles(asset, quote, candles, time_range)
+    except ValueError as error:
+        history['error'] = {'status': response.status_code, 'message': str(error)}
+        return history
 
-    history['candles'].sort(key=lambda entry: entry['time'])
+    history['candles'] = [candle.to_dict() for candle in series.candles]
     return history
 
 
@@ -123,7 +118,8 @@ def _fetch_candles(product_id, start_timestamp, end_timestamp):
             return response, None
 
         if response.status_code in RETRY_STATUSES and attempt < MAX_RETRIES:
-            time.sleep(BACKOFF_SECONDS * (2 ** attempt))
+            jitter = random.uniform(0, BACKOFF_SECONDS)
+            time.sleep((BACKOFF_SECONDS * (2 ** attempt)) + jitter)
             continue
 
         return response, {
@@ -133,3 +129,32 @@ def _fetch_candles(product_id, start_timestamp, end_timestamp):
         }
 
     return None, {'message': 'Request retries exhausted'}
+
+
+def _normalize_coinbase_candles(asset, quote, candles, time_range):
+    normalized = []
+    for candle in candles:
+        if len(candle) < 6:
+            raise ValueError(f'Unexpected candle format: {candle}')
+        # Coinbase Exchange candle format: [time, low, high, open, close, volume]
+        time_epoch = int(candle[0])
+        if not time_range.contains_epoch(time_epoch):
+            continue
+        normalized.append(
+            Candle(
+                time=time_epoch,
+                open=float(candle[3]),
+                high=float(candle[2]),
+                low=float(candle[1]),
+                close=float(candle[4]),
+                volume=float(candle[5]),
+            )
+        )
+
+    normalized.sort(key=lambda entry: entry.time)
+    return Series(
+        asset=asset,
+        quote=quote,
+        granularity=DAILY_GRANULARITY_SECONDS,
+        candles=normalized,
+    )

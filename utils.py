@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from os import path, mkdir
 
 import gspread
@@ -9,6 +9,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import config
 import google_utils
 import printer
+from domain import DATE_FORMAT
 
 
 workbook_name = config.google_workbook_name
@@ -26,18 +27,19 @@ def import_csv_as_list(csv_filename):
 
 # tested
 def get_yesterday():
-    return datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%d')
+    utc_now = datetime.now(timezone.utc)
+    return datetime.strftime(utc_now - timedelta(1), DATE_FORMAT)
 
 
 # tested
 def get_date_range(start_date, end_date):
-    return [date.strftime('%Y-%m-%d') for date in pd.date_range(start_date, end_date)]
+    return [date.strftime(DATE_FORMAT) for date in pd.date_range(start_date, end_date)]
 
 
 # tested
 def get_day_after(date):
     date_formatted = datetime.strptime(date, '%Y-%m-%d')
-    return datetime.strftime(date_formatted + timedelta(1), '%Y-%m-%d')
+    return datetime.strftime(date_formatted + timedelta(1), DATE_FORMAT)
 
 
 # tested
