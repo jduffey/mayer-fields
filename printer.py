@@ -1,5 +1,5 @@
 def check_compatibility_of_price_data_with_worksheet(csv_filename, worksheet_name):
-    print(f'Checking compatability of "{csv_filename}" with "{worksheet_name}"...\n')
+    print(f'Checking compatibility of "{csv_filename}" with "{worksheet_name}"...\n')
 
 
 def created_directory(output_data_dir):
