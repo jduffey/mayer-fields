@@ -14,6 +14,15 @@ class FakeResponse:
         return self._payload
 
 
+class FakeJsonErrorResponse:
+    def __init__(self, status_code):
+        self.status_code = status_code
+        self.text = 'not-json'
+
+    def json(self):
+        raise ValueError('Invalid JSON')
+
+
 def test_get_price_history_parses_and_sorts(monkeypatch):
     candles = [
         [1609545600, 900.0, 1100.0, 950.0, 1000.0, 12.5],
@@ -85,6 +94,30 @@ def test_get_price_history_non_200(monkeypatch):
 
     assert history['error']['status'] == 500
     assert call_count['count'] == coinbase_utils.MAX_RETRIES + 1
+
+
+def test_get_price_history_invalid_json(monkeypatch):
+    monkeypatch.setattr(
+        coinbase_utils.requests,
+        'get',
+        lambda url, params, timeout: FakeJsonErrorResponse(200),
+    )
+
+    history = coinbase_utils.get_price_history('BTC', 'USD', '2020-01-01', '2020-01-02')
+
+    assert history['error']['message'] == 'Invalid JSON response'
+
+
+def test_get_price_history_invalid_payload(monkeypatch):
+    monkeypatch.setattr(
+        coinbase_utils.requests,
+        'get',
+        lambda url, params, timeout: FakeResponse(200, {'bad': 'payload'}),
+    )
+
+    history = coinbase_utils.get_price_history('BTC', 'USD', '2020-01-01', '2020-01-02')
+
+    assert history['error']['message'] == 'Invalid candle payload'
 
 
 def test_get_spot_price_for_date_mismatched_candle_date(monkeypatch):
