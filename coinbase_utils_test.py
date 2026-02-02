@@ -1,4 +1,7 @@
+import requests
+
 import coinbase_utils
+import domain
 
 
 class FakeResponse:
@@ -109,3 +112,49 @@ def test_get_spot_price_for_date_mismatched_candle_date(monkeypatch):
         assert False, 'Expected ValueError for mismatched candle date'
     except ValueError as error:
         assert 'No candle data available' in str(error)
+
+
+def test_build_date_windows_splits_range():
+    windows = coinbase_utils._build_date_windows('2021-01-01', '2021-01-10', 3)
+
+    assert windows == [
+        ('2021-01-01', '2021-01-04'),
+        ('2021-01-04', '2021-01-07'),
+        ('2021-01-07', '2021-01-10'),
+    ]
+
+
+def test_sort_and_dedupe_candles_by_time():
+    candles = [
+        domain.Candle(time=2, open=1.0, high=2.0, low=0.5, close=1.5, volume=100.0),
+        domain.Candle(time=1, open=0.5, high=1.5, low=0.25, close=1.0, volume=80.0),
+        domain.Candle(time=2, open=9.0, high=9.5, low=8.5, close=9.1, volume=120.0),
+    ]
+
+    result = coinbase_utils._sort_and_dedupe_candles(candles)
+
+    assert [candle.time for candle in result] == [1, 2]
+    assert result[1].open == 9.0
+
+
+def test_fetch_candles_retries_on_request_exception(monkeypatch):
+    call_count = {'count': 0}
+
+    def fake_get(url, params, timeout):
+        call_count['count'] += 1
+        if call_count['count'] < 3:
+            raise requests.RequestException('network error')
+        return FakeResponse(200, [])
+
+    monkeypatch.setattr(coinbase_utils.requests, 'get', fake_get)
+    monkeypatch.setattr(coinbase_utils, '_sleep_with_backoff', lambda *_: None)
+
+    response, error = coinbase_utils._fetch_candles(
+        'BTC-USD',
+        '2021-01-01T00:00:00Z',
+        '2021-01-02T00:00:00Z',
+    )
+
+    assert error is None
+    assert response.status_code == 200
+    assert call_count['count'] == 3
