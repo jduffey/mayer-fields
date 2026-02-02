@@ -48,7 +48,15 @@ def get_price_history(asset, quote, start_date, end_date):
         if not payload:
             continue
 
-        candles = domain.parse_coinbase_candles(payload)
+        try:
+            candles = domain.parse_coinbase_candles(payload)
+        except ValueError as error:
+            history['error'] = {
+                'status': response.status_code,
+                'message': 'Invalid candle payload',
+                'details': str(error),
+            }
+            return history
         candles = [candle for candle in candles if time_range.contains_epoch(candle.time)]
         collected.extend(candles)
 
